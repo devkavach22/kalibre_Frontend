@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardNavbar from '../dashboards/DashboardNavbar';
 
@@ -89,7 +89,6 @@ const FILTERS = {
   },
 };
 
-// ─── JobCard ──────────────────────────────────────────────────────────────────
 function JobCard({ job }) {
   const [saved, setSaved] = useState(false);
   const navigate = useNavigate();
@@ -99,7 +98,6 @@ function JobCard({ job }) {
       onClick={() => navigate(`/candidates/job/${job.id}`)}
       className="bg-white rounded-xl p-4 border border-gray-100 hover:shadow-md transition-shadow duration-200 flex flex-col gap-3 h-full cursor-pointer"
     >
-      {/* Header */}
       <div className="flex items-start gap-3">
         <div
           className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xs flex-shrink-0"
@@ -117,7 +115,6 @@ function JobCard({ job }) {
         </div>
       </div>
 
-      {/* Meta */}
       <div className="flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-gray-500">
         <span className="flex items-center gap-1">
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -140,20 +137,16 @@ function JobCard({ job }) {
         </span>
       </div>
 
-      {/* Description */}
       <p className="text-[12px] text-gray-500 leading-relaxed line-clamp-2">{job.description}</p>
 
-      {/* Tags */}
       <div className="flex flex-wrap gap-1.5">
         {job.tags.map((tag) => (
           <span key={tag} className="text-[12px] text-gray-500 before:content-['•'] before:mr-1 before:text-gray-300">{tag}</span>
         ))}
       </div>
 
-      {/* Spacer pushes footer to bottom */}
       <div className="flex-1" />
 
-      {/* Footer */}
       <div className="flex items-center justify-between pt-2 border-t border-gray-50">
         <div className="flex items-center gap-2">
           <span className="text-[12px] px-2.5 py-0.5 rounded-full border border-gray-200 text-gray-600">{job.jobType}</span>
@@ -181,7 +174,6 @@ function JobCard({ job }) {
   );
 }
 
-// ─── FilterSection ────────────────────────────────────────────────────────────
 function FilterSection({ title, children, defaultOpen = true }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
@@ -203,7 +195,6 @@ function FilterSection({ title, children, defaultOpen = true }) {
   );
 }
 
-// ─── CheckboxList with View More ──────────────────────────────────────────────
 function CheckboxList({ baseItems, extraItems = [], selected, onToggle }) {
   const [showMore, setShowMore] = useState(false);
   const visible = showMore ? [...baseItems, ...extraItems] : baseItems;
@@ -249,7 +240,6 @@ function CheckboxList({ baseItems, extraItems = [], selected, onToggle }) {
   );
 }
 
-// ─── FilterContent ────────────────────────────────────────────────────────────
 function FilterContent({
   selectedWorkMode, setSelectedWorkMode,
   selectedDept, setSelectedDept,
@@ -344,7 +334,6 @@ function FilterContent({
   );
 }
 
-// ─── Main Page ────────────────────────────────────────────────────────────────
 function CandidateDashboard() {
   const [activeTab, setActiveTab]         = useState('profile');
   const [keyword, setKeyword]             = useState('');
@@ -352,6 +341,9 @@ function CandidateDashboard() {
   const [locationInput, setLocationInput] = useState('');
   const [showRelevance, setShowRelevance] = useState(true);
   const [sidebarOpen, setSidebarOpen]     = useState(false);
+  const [dropdownOpen, setDropdownOpen]   = useState(false);
+
+  const dropdownRef = useRef(null);
 
   const [selectedWorkMode, setSelectedWorkMode] = useState([]);
   const [selectedDept,     setSelectedDept]     = useState([]);
@@ -360,6 +352,16 @@ function CandidateDashboard() {
   const [selectedRole,     setSelectedRole]     = useState([]);
   const [selectedLocation, setSelectedLocation] = useState([]);
   const [expRange,         setExpRange]         = useState(30);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const toggle = (setter, list, value) =>
     setter(list.includes(value) ? list.filter((v) => v !== value) : [...list, value]);
@@ -430,64 +432,129 @@ function CandidateDashboard() {
   const firstThree     = activeJobs.slice(0, 3);
   const rest           = activeJobs.slice(3);
 
+  const expOptions = [
+    { value: '', label: 'Select Experience' },
+    { value: '0-1', label: '0-1 Years' },
+    { value: '1-3', label: '1-3 Years' },
+    { value: '3-5', label: '3-5 Years' },
+    { value: '5+', label: '5+ Years' }
+  ];
+
+  const currentExpLabel = expOptions.find(o => o.value === experience)?.label || 'Select Experience';
+
   return (
     <div className="min-h-screen" style={{ background: 'linear-gradient(323.05deg,#FFE8E8 13.91%,#FFF5F5 79.76%)' }}>
       <DashboardNavbar />
 
       {/* ── Hero ── */}
       <div className="px-4 sm:px-6 lg:px-10 pt-5 pb-0">
-        <div className="rounded-2xl px-6 sm:px-8 py-5" style={{ background: 'linear-gradient(135deg,#FFF0F0 0%,#FFE4E4 100%)' }}>
-          <div className="flex items-start justify-between gap-4">
+        <div className="rounded-2xl px-4 sm:px-6 lg:px-8 py-5" style={{ background: 'linear-gradient(135deg,#FFF0F0 0%,#FFE4E4 100%)' }}>
+          
+          {/* Header Row */}
+          <div className="flex items-start justify-between gap-4 w-full">
             <div>
               <span className="inline-block text-xs font-medium text-[#C8102E] bg-white border border-pink-200 px-3 py-1 rounded-full mb-2">
                 Discovery Market
               </span>
-              <h1 className="text-2xl sm:text-3xl font-bold text-[#111111]">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-[#111111]">
                 Job <span className="text-[#C8102E]">Intelligence</span>
               </h1>
               <p className="text-xs text-gray-500 mt-1 max-w-md">
                 AI-Curated Opportunities Tailored To Your Professional Profile And Career Velocity.
               </p>
             </div>
+
+            {/* Mobile View Filters Trigger Button */}
+            <div className="lg:hidden flex-shrink-0">
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="flex items-center gap-1 px-3 py-1.5 rounded-full text-white text-[11px] font-semibold shadow-sm transition-all active:scale-95"
+                style={{ background: 'linear-gradient(92.62deg,#FA2329 0.91%,#B10D1C 99.09%)' }}
+              >
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z" />
+                </svg>
+                Filters {appliedCount > 0 && `(${appliedCount})`}
+              </button>
+            </div>
+
+            {/* Desktop-only Right Action Button Layout */}
             <button
-              className="flex-shrink-0 hidden sm:flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-xs font-semibold hover:opacity-90"
+              className="hidden sm:inline-flex flex-shrink-0 items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-white text-xs font-semibold hover:opacity-90 w-auto"
               style={{ background: 'linear-gradient(92.62deg,#FA2329 0.91%,#B10D1C 99.09%)' }}
             >
               12 New Matches
             </button>
           </div>
 
-          {/* Search Bar */}
-          <div className="mt-4 flex items-center bg-white rounded-full border border-gray-200 shadow-sm overflow-hidden max-w-2xl mx-auto">
+          {/* Mobile view supplementary match element */}
+          <div className="sm:hidden mt-3 w-full">
+            <button
+              className="w-full py-2 rounded-xl text-white text-xs font-semibold"
+              style={{ background: 'linear-gradient(92.62deg,#FA2329 0.91%,#B10D1C 99.09%)' }}
+            >
+              12 New Matches
+            </button>
+          </div>
+
+          {/* Search Dropdown / Form Control Block (FIXED: removed overflow-hidden to let dropdown render properly) */}
+          <div className="mt-4 flex flex-col lg:flex-row lg:items-center bg-white rounded-2xl lg:rounded-full border border-gray-200 shadow-sm max-w-2xl mx-auto p-1 lg:p-0 relative z-40">
             <input
               type="text" value={keyword} onChange={(e) => setKeyword(e.target.value)}
               placeholder="Enter Keyword / Designation / Companies"
-              className="flex-1 px-4 py-3 text-xs text-gray-700 placeholder-gray-400 outline-none min-w-0"
+              className="w-full lg:flex-1 px-4 py-3 text-xs text-gray-700 placeholder-gray-400 outline-none min-w-0 border-b lg:border-b-0 border-gray-100 lg:rounded-l-full"
             />
-            <div className="w-px h-5 bg-gray-200 flex-shrink-0" />
-            <div className="relative flex-shrink-0">
-              <select
-                value={experience} onChange={(e) => setExperience(e.target.value)}
-                className="appearance-none px-3 py-3 pr-7 text-xs text-gray-500 outline-none bg-transparent cursor-pointer"
+            <div className="hidden lg:block w-px h-5 bg-gray-200 flex-shrink-0" />
+            
+            {/* Custom Interactive Dropdown Component Layer from HrDashboard */}
+            <div className="relative w-full lg:w-auto flex-shrink-0 border-b lg:border-b-0 border-gray-100" ref={dropdownRef}>
+              <button
+                type="button"
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                className="w-full lg:w-48 px-4 lg:px-5 py-3 flex items-center justify-between text-xs text-gray-500 bg-transparent outline-none cursor-pointer text-left font-medium"
               >
-                <option value="">Select Experience</option>
-                <option>0-1 Years</option>
-                <option>1-3 Years</option>
-                <option>3-5 Years</option>
-                <option>5+ Years</option>
-              </select>
-              <svg className="absolute right-1.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
+                <span>{currentExpLabel}</span>
+                <svg 
+                  className={`w-3.5 h-3.5 text-gray-400 pointer-events-none transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`} 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              
+              {dropdownOpen && (
+                <div className="absolute left-0 right-0 mt-1 lg:mt-2 bg-white border border-gray-100 rounded-xl shadow-xl z-50 overflow-hidden py-1 max-h-60 overflow-y-auto">
+                  {expOptions.map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => {
+                        setExperience(opt.value);
+                        setDropdownOpen(false);
+                      }}
+                      className={`w-full px-4 py-2.5 text-left text-xs transition-colors duration-150 ${
+                        experience === opt.value 
+                          ? 'bg-red-50 text-[#C8102E] font-semibold' 
+                          : 'text-gray-600 hover:bg-gray-50'
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
-            <div className="w-px h-5 bg-gray-200 flex-shrink-0" />
+
+            <div className="hidden lg:block w-px h-5 bg-gray-200 flex-shrink-0" />
             <input
               type="text" value={locationInput} onChange={(e) => setLocationInput(e.target.value)}
               placeholder="Enter Location"
-              className="flex-1 px-3 py-3 text-xs text-gray-700 placeholder-gray-400 outline-none min-w-0"
+              className="w-full lg:flex-1 px-4 py-3 text-xs text-gray-700 placeholder-gray-400 outline-none min-w-0"
             />
             <button
-              className="flex items-center gap-1.5 px-4 py-2.5 text-white text-xs font-semibold rounded-full m-1 flex-shrink-0"
+              className="flex items-center justify-center gap-1.5 px-4 py-2.5 text-white text-xs font-semibold rounded-xl lg:rounded-full m-1 flex-shrink-0 w-full lg:w-auto"
               style={{ background: 'linear-gradient(92.62deg,#FA2329 0.91%,#B10D1C 99.09%)' }}
             >
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -505,15 +572,15 @@ function CandidateDashboard() {
         {/* ── Cards (LEFT) ── */}
         <main className="flex-1 min-w-0 flex flex-col gap-4">
 
-          {/* Tabs */}
-          <div className="flex items-center gap-2 bg-white rounded-full p-1 self-start shadow-sm border border-gray-100">
+          {/* Tabs Container */}
+          <div className="flex items-center justify-evenly bg-white rounded-full p-2 w-full max-w-xs sm:max-w-sm mx-auto lg:mx-0 lg:self-start shadow-sm border border-gray-100">
             {['profile', 'preferences'].map((tab) => {
               const count = tab === 'profile' ? profileJobs.length : preferenceJobs.length;
               return (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className="px-4 py-2 rounded-full text-xs font-semibold capitalize transition-all duration-200"
+                  className="flex-1 lg:flex-none px-3 sm:px-4 py-2 rounded-full text-xs font-semibold capitalize transition-all duration-200 text-center"
                   style={
                     activeTab === tab
                       ? { background: 'linear-gradient(92.62deg,#FA2329 0.91%,#B10D1C 99.09%)', color: '#fff' }
@@ -526,9 +593,11 @@ function CandidateDashboard() {
             })}
           </div>
 
+
+
           {/* First three cards */}
           {firstThree.length > 0 && (
-            <div className="grid grid-cols-3 gap-3 items-stretch">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 items-stretch">
               {firstThree.map((job) => <JobCard key={job.id} job={job} />)}
             </div>
           )}
@@ -536,13 +605,13 @@ function CandidateDashboard() {
           {/* Relevance Banner */}
           {showRelevance && activeJobs.length > 0 && (
             <div
-              className="rounded-xl px-4 py-3 flex items-center justify-between"
+              className="rounded-xl px-4 py-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
               style={{ background: 'linear-gradient(135deg,#FFF0F0 0%,#FFE4E4 100%)', border: '1px solid #fecdd3' }}
             >
               <p className="text-xs font-semibold text-[#111111]">
                 Are These <span className="text-[#C8102E]">Jobs</span> Relevant For You?
               </p>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
                 <button
                   onClick={() => setShowRelevance(false)}
                   className="px-4 py-1.5 rounded-full text-xs font-semibold bg-white border border-gray-200 text-gray-600"
@@ -562,7 +631,7 @@ function CandidateDashboard() {
 
           {/* Remaining cards */}
           {rest.length > 0 && (
-            <div className="grid grid-cols-3 gap-3 items-stretch">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 items-stretch">
               {rest.map((job) => <JobCard key={job.id} job={job} />)}
             </div>
           )}
@@ -597,21 +666,7 @@ function CandidateDashboard() {
           <FilterContent {...filterProps} />
         </aside>
 
-        {/* Mobile Filter Toggle */}
-        <div className="lg:hidden fixed bottom-6 right-4 z-40">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-full text-white text-xs font-semibold shadow-lg"
-            style={{ background: 'linear-gradient(92.62deg,#FA2329 0.91%,#B10D1C 99.09%)' }}
-          >
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z" />
-            </svg>
-            Filters {appliedCount > 0 && `(${appliedCount})`}
-          </button>
-        </div>
-
-        {/* Mobile Drawer */}
+        {/* Mobile Drawer Filter Layer Overlay */}
         {sidebarOpen && (
           <div className="fixed inset-0 z-50 lg:hidden">
             <div className="absolute inset-0 bg-black/40" onClick={() => setSidebarOpen(false)} />

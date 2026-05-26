@@ -199,34 +199,35 @@ const CandidateRegistration = () => {
 
         {/* Header */}
         <div className="mb-5">
-          <h1 className="text-[#111] font-bold text-2xl">New Candidate Registration</h1>
-          <p className="text-[#777] text-sm mt-1">Add New Employee Details In The System</p>
+          <h1 className="text-[#111] font-bold text-xl sm:text-2xl">New Candidate Registration</h1>
+          <p className="text-[#777] text-xs sm:text-sm mt-1">Add New Employee Details In The System</p>
         </div>
 
         {/* Resume Builder Banner */}
-        <div className="rounded-2xl px-6 py-4 mb-5 flex items-center justify-between" style={{ background: 'linear-gradient(135deg, #fff5f5 0%, #ffe4e4 100%)', border: '1px solid #ffd0d0' }}>
+        <div className="rounded-2xl px-5 py-4 mb-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4" style={{ background: 'linear-gradient(135deg, #fff5f5 0%, #ffe4e4 100%)', border: '1px solid #ffd0d0' }}>
           <div>
             <h3 className="text-[#C8102E] font-bold text-base">Don't Have A Resume?</h3>
-            <p className="text-[#555] text-sm mt-0.5">Use The Resume Builder To Manually Create A Professional Resume<br />And Populate Your Profile.</p>
+            <p className="text-[#555] text-xs sm:text-sm mt-0.5">Use The Resume Builder To Manually Create A Professional Resume<br className="hidden sm:inline" />And Populate Your Profile.</p>
           </div>
-          <button className="text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition-all duration-200 hover:opacity-90 whitespace-nowrap ml-4" style={{ background: 'linear-gradient(92.62deg, #FA2329 0.91%, #B10D1C 99.09%)' }}>
+          <button className="w-full sm:w-auto text-center text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition-all duration-200 hover:opacity-90 whitespace-nowrap sm:ml-4" style={{ background: 'linear-gradient(92.62deg, #FA2329 0.91%, #B10D1C 99.09%)' }}>
             Resume Builder
           </button>
         </div>
 
-        <div className="flex gap-4 items-start">
+        {/* Made flex layout adapt via direction swapping for layouts */}
+        <div className="flex flex-col lg:flex-row gap-4 items-start">
           {/* Main Form */}
-          <div className="flex-1 min-w-0 flex flex-col gap-5">
+          <div className="w-full flex-1 min-w-0 flex flex-col gap-5">
 
             {/* Upload Resume */}
             <div
-              className={`rounded-2xl border-2 border-dashed p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-200 bg-white ${isDragging ? 'border-[#C8102E] bg-[#fff5f5]' : 'border-gray-200 hover:border-[#C8102E]/40'}`}
+              className={`rounded-2xl border-2 border-dashed p-6 sm:p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-200 bg-white ${isDragging ? 'border-[#C8102E] bg-[#fff5f5]' : 'border-gray-200 hover:border-[#C8102E]/40'}`}
               onDragOver={(e) => { e.preventDefault(); setIsDragging(true) }}
               onDragLeave={() => setIsDragging(false)}
               onDrop={handleDrop}
               onClick={() => !loading && fileInputRef.current?.click()}
             >
-              <input ref={fileInputRef} type="file" accept=".pdf,.doc,.docx" className="hidden" onChange={handleFileChange} />
+              <input type="file" ref={fileInputRef} accept=".pdf,.doc,.docx" className="hidden" onChange={handleFileChange} />
               <div className="w-12 h-12 rounded-full flex items-center justify-center mb-3" style={{ background: '#fff0f0' }}>
                 {loading ? (
                   <svg className="w-6 h-6 text-[#C8102E] animate-spin" fill="none" viewBox="0 0 24 24">
@@ -239,16 +240,16 @@ const CandidateRegistration = () => {
                   </svg>
                 )}
               </div>
-              <p className="text-[#C8102E] font-semibold text-base">
+              <p className="text-[#C8102E] font-semibold text-base break-all px-2">
                 {loading ? 'Parsing Resume...' : resumeFile ? resumeFile.name : 'Upload Resume'}
               </p>
-              <p className="text-[#888] text-sm mt-1">
+              <p className="text-[#888] text-xs sm:text-sm mt-1 max-w-md mx-auto">
                 {loading ? 'Please wait while we auto-fill your details.' : resumeFile ? 'Click to change file' : 'Upload Your Resume To Auto-Fill All Profile Details.'}
               </p>
             </div>
 
             {/* Personal Information */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-100">
+            <div className="bg-white rounded-2xl p-4 sm:p-6 border border-gray-100">
               <div className="flex items-center gap-2 mb-5">
                 <div className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: '#fff0f0' }}>
                   <svg className="w-4 h-4 text-[#C8102E]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -313,7 +314,7 @@ const CandidateRegistration = () => {
               {/* Gender */}
               <div className="mt-4">
                 <label className={labelClass}>Gender <span className="text-[#C8102E]">*</span></label>
-                <div className="flex items-center gap-6 mt-1">
+                <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mt-1">
                   {['Male', 'Female', 'Other'].map(g => (
                     <label key={g} className="flex items-center gap-2 cursor-pointer">
                       <div
@@ -331,7 +332,7 @@ const CandidateRegistration = () => {
             </div>
 
             {/* Professional Details */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-100">
+            <div className="bg-white rounded-2xl p-4 sm:p-6 border border-gray-100">
               <div className="flex items-center gap-2 mb-5">
                 <div className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: '#fff0f0' }}>
                   <svg className="w-4 h-4 text-[#C8102E]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -361,8 +362,8 @@ const CandidateRegistration = () => {
             </div>
 
             {/* Education */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-100">
-              <div className="flex items-center justify-between mb-5">
+            <div className="bg-white rounded-2xl p-4 sm:p-6 border border-gray-100">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
                 <div className="flex items-center gap-2">
                   <div className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: '#fff0f0' }}>
                     <svg className="w-4 h-4 text-[#C8102E]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -371,7 +372,7 @@ const CandidateRegistration = () => {
                   </div>
                   <h2 className="font-semibold text-[#111] text-base">Education</h2>
                 </div>
-                <button onClick={openAddEdu} className="text-white text-xs font-semibold px-4 py-2 rounded-lg transition-all hover:opacity-90" style={{ background: 'linear-gradient(92.62deg, #FA2329 0.91%, #B10D1C 99.09%)' }}>
+                <button onClick={openAddEdu} className="w-full sm:w-auto text-center text-white text-xs font-semibold px-4 py-2 rounded-lg transition-all hover:opacity-90" style={{ background: 'linear-gradient(92.62deg, #FA2329 0.91%, #B10D1C 99.09%)' }}>
                   + Add Education
                 </button>
               </div>
@@ -381,21 +382,21 @@ const CandidateRegistration = () => {
                 ) : (
                   education.map((edu, i) => (
                     <div key={edu.id}>
-                      <div className="py-3 flex items-start justify-between">
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-[#C8102E] font-semibold text-sm">{edu.degree || '—'}</span>
-                            <button onClick={() => openEditEdu(edu)} className="text-gray-400 hover:text-[#C8102E] transition-colors">
+                      <div className="py-3 flex items-start justify-between gap-2">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-[#C8102E] font-semibold text-sm break-words">{edu.degree || '—'}</span>
+                            <button onClick={() => openEditEdu(edu)} className="text-gray-400 hover:text-[#C8102E] transition-colors flex-shrink-0">
                               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                             </button>
                           </div>
-                          <p className="text-[#555] text-xs mt-0.5">{edu.institute}</p>
+                          <p className="text-[#555] text-xs mt-0.5 break-words">{edu.institute}</p>
                           {/* ✅ Show new fields in card */}
-                          {edu.course && <p className="text-[#666] text-xs mt-0.5">Course: {edu.course}</p>}
-                          {edu.specialization && <p className="text-[#666] text-xs mt-0.5">Specialization: {edu.specialization}</p>}
-                          {edu.board && <p className="text-[#666] text-xs mt-0.5">Board: {edu.board}</p>}
+                          {edu.course && <p className="text-[#666] text-xs mt-0.5 break-words">Course: {edu.course}</p>}
+                          {edu.specialization && <p className="text-[#666] text-xs mt-0.5 break-words">Specialization: {edu.specialization}</p>}
+                          {edu.board && <p className="text-[#666] text-xs mt-0.5 break-words">Board: {edu.board}</p>}
                           <p className="text-[#888] text-xs mt-0.5">{edu.years} {edu.years && '|'} {edu.type}</p>
-                          {edu.level && <span className="inline-block mt-1.5 text-xs px-3 py-0.5 rounded-full bg-gray-100 text-[#555]">{edu.level}</span>}
+                          {edu.level && <span className="inline-block mt-1.5 text-xs px-3 py-0.5 rounded-full bg-gray-100 text-[#555] max-w-full truncate">{edu.level}</span>}
                         </div>
                       </div>
                       {i < education.length - 1 && <div className="border-t border-gray-100" />}
@@ -406,8 +407,8 @@ const CandidateRegistration = () => {
             </div>
 
             {/* Work Experience */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-100">
-              <div className="flex items-center justify-between mb-5">
+            <div className="bg-white rounded-2xl p-4 sm:p-6 border border-gray-100">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
                 <div className="flex items-center gap-2">
                   <div className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: '#fff0f0' }}>
                     <svg className="w-4 h-4 text-[#C8102E]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -416,7 +417,7 @@ const CandidateRegistration = () => {
                   </div>
                   <h2 className="font-semibold text-[#111] text-base">Work Experience</h2>
                 </div>
-                <button onClick={openAddExp} className="text-white text-xs font-semibold px-4 py-2 rounded-lg transition-all hover:opacity-90" style={{ background: 'linear-gradient(92.62deg, #FA2329 0.91%, #B10D1C 99.09%)' }}>
+                <button onClick={openAddExp} className="w-full sm:w-auto text-center text-white text-xs font-semibold px-4 py-2 rounded-lg transition-all hover:opacity-90" style={{ background: 'linear-gradient(92.62deg, #FA2329 0.91%, #B10D1C 99.09%)' }}>
                   + Add Experience
                 </button>
               </div>
@@ -426,16 +427,18 @@ const CandidateRegistration = () => {
                 ) : (
                   experience.map((exp, i) => (
                     <div key={exp.id}>
-                      <div className="py-3">
-                        <div className="flex items-center gap-2">
-                          <span className="text-[#C8102E] font-semibold text-sm">{exp.title || '—'}</span>
-                          <button onClick={() => openEditExp(exp)} className="text-gray-400 hover:text-[#C8102E] transition-colors">
-                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                          </button>
+                      <div className="py-3 flex items-start justify-between gap-2">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-[#C8102E] font-semibold text-sm break-words">{exp.title || '—'}</span>
+                            <button onClick={() => openEditExp(exp)} className="text-gray-400 hover:text-[#C8102E] transition-colors flex-shrink-0">
+                              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                            </button>
+                          </div>
+                          <p className="text-[#555] text-xs mt-0.5 break-words">{exp.company}</p>
+                          <p className="text-[#888] text-xs mt-0.5">{exp.period} {exp.period && '|'} {exp.type}</p>
+                          {exp.skills && <p className="text-[#888] text-xs mt-0.5 break-words">Primary Skills: {exp.skills}</p>}
                         </div>
-                        <p className="text-[#555] text-xs mt-0.5">{exp.company}</p>
-                        <p className="text-[#888] text-xs mt-0.5">{exp.period} {exp.period && '|'} {exp.type}</p>
-                        {exp.skills && <p className="text-[#888] text-xs mt-0.5">Primary Skills: {exp.skills}</p>}
                       </div>
                       {i < experience.length - 1 && <div className="border-t border-gray-100" />}
                     </div>
@@ -445,7 +448,7 @@ const CandidateRegistration = () => {
             </div>
 
             {/* Key Skills */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-100">
+            <div className="bg-white rounded-2xl p-4 sm:p-6 border border-gray-100">
               <div className="flex items-center gap-2 mb-5">
                 <div className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: '#fff0f0' }}>
                   <svg className="w-4 h-4 text-[#C8102E]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -465,17 +468,17 @@ const CandidateRegistration = () => {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-4 pb-6">
+            <div className="flex flex-col sm:flex-row gap-3 pb-6">
               <button
                 onClick={() => navigate(-1)}
-                className="flex-1 py-3 rounded-xl border-2 border-[#C8102E] text-[#C8102E] font-semibold text-sm transition-all hover:bg-[#fff0f0]"
+                className="w-full sm:flex-1 py-3 rounded-xl border-2 border-[#C8102E] text-[#C8102E] font-semibold text-sm transition-all hover:bg-[#fff0f0]"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSubmit}
                 disabled={submitLoading}
-                className="flex-1 py-3 rounded-xl text-white font-semibold text-sm transition-all hover:opacity-90 disabled:opacity-60"
+                className="w-full sm:flex-1 py-3 rounded-xl text-white font-semibold text-sm transition-all hover:opacity-90 disabled:opacity-60"
                 style={{ background: 'linear-gradient(92.62deg, #FA2329 0.91%, #B10D1C 99.09%)' }}
               >
                 {submitLoading ? 'Submitting...' : 'Submit Registration'}
@@ -485,10 +488,10 @@ const CandidateRegistration = () => {
           </div>
 
           {/* Right Sidebar */}
-          <div className="w-[340px] flex-shrink-0 hidden lg:flex flex-col gap-4 sticky top-6">
+          <div className="w-full lg:w-[340px] flex-shrink-0 flex flex-col gap-4 lg:sticky lg:top-6">
             <div className="bg-white rounded-2xl p-4 border border-gray-100 flex flex-col items-center">
               <img src={Logo} alt="Kalibre" className="h-10 object-contain mb-3" />
-              <img src={AuthPick} alt="Illustration" className="w-full object-contain" />
+              <img src={AuthPick} alt="Illustration" className="w-48 sm:w-64 lg:w-full object-contain" />
             </div>
 
             {/* Profile Completion */}
@@ -515,12 +518,12 @@ const CandidateRegistration = () => {
         </div>
       </div>
 
-      {/* Education Modal — ✅ with course, specialization, board fields */}
+      {/* Education Modal — ✅ with course, specialization, board fields (Scrollable max height added for small devices) */}
       {showEduModal && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl">
-            <h3 className="font-bold text-[#111] text-lg mb-4">{editingEdu ? 'Edit Education' : 'Add Education'}</h3>
-            <div className="flex flex-col gap-3">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4 py-6">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl flex flex-col max-h-full">
+            <h3 className="font-bold text-[#111] text-lg mb-4 flex-shrink-0">{editingEdu ? 'Edit Education' : 'Add Education'}</h3>
+            <div className="flex flex-col gap-3 overflow-y-auto pr-1 py-1 style-scrollbar">
               <div>
                 <label className={labelClass}>Degree / Course</label>
                 <input className={inputClass} value={eduForm.degree} onChange={e => setEduForm({ ...eduForm, degree: e.target.value })} placeholder="e.g. B.Tech, MBA" />
@@ -542,7 +545,7 @@ const CandidateRegistration = () => {
                 <label className={labelClass}>Board / University</label>
                 <input className={inputClass} value={eduForm.board} onChange={e => setEduForm({ ...eduForm, board: e.target.value })} placeholder="e.g. Maharashtra" />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className={labelClass}>Years</label>
                   <input className={inputClass} value={eduForm.years} onChange={e => setEduForm({ ...eduForm, years: e.target.value })} placeholder="2020-2024" />
@@ -561,7 +564,7 @@ const CandidateRegistration = () => {
                 <input className={inputClass} value={eduForm.level} onChange={e => setEduForm({ ...eduForm, level: e.target.value })} placeholder="e.g. Primary Doctorate" />
               </div>
             </div>
-            <div className="flex gap-3 mt-5">
+            <div className="flex gap-3 mt-5 pt-2 border-t border-gray-100 flex-shrink-0">
               <button onClick={() => setShowEduModal(false)} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm text-[#555] hover:bg-gray-50 transition-all">Cancel</button>
               <button onClick={saveEdu} className="flex-1 py-2.5 rounded-xl text-white text-sm font-semibold hover:opacity-90 transition-all" style={{ background: 'linear-gradient(92.62deg, #FA2329 0.91%, #B10D1C 99.09%)' }}>Save</button>
             </div>
@@ -569,12 +572,12 @@ const CandidateRegistration = () => {
         </div>
       )}
 
-      {/* Experience Modal */}
+      {/* Experience Modal (Scrollable max height added for small devices) */}
       {showExpModal && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl">
-            <h3 className="font-bold text-[#111] text-lg mb-4">{editingExp ? 'Edit Experience' : 'Add Experience'}</h3>
-            <div className="flex flex-col gap-3">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4 py-6">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl flex flex-col max-h-full">
+            <h3 className="font-bold text-[#111] text-lg mb-4 flex-shrink-0">{editingExp ? 'Edit Experience' : 'Add Experience'}</h3>
+            <div className="flex flex-col gap-3 overflow-y-auto pr-1 py-1 style-scrollbar">
               <div>
                 <label className={labelClass}>Job Title</label>
                 <input className={inputClass} value={expForm.title} onChange={e => setExpForm({ ...expForm, title: e.target.value })} placeholder="e.g. Senior Software Engineer" />
@@ -583,7 +586,7 @@ const CandidateRegistration = () => {
                 <label className={labelClass}>Company & Location</label>
                 <input className={inputClass} value={expForm.company} onChange={e => setExpForm({ ...expForm, company: e.target.value })} placeholder="Company Pvt. Ltd. City, State" />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className={labelClass}>Period</label>
                   <input className={inputClass} value={expForm.period} onChange={e => setExpForm({ ...expForm, period: e.target.value })} placeholder="Jan 2020 – Present" />
@@ -603,7 +606,7 @@ const CandidateRegistration = () => {
                 <input className={inputClass} value={expForm.skills} onChange={e => setExpForm({ ...expForm, skills: e.target.value })} placeholder="React.Js, Node.Js, TypeScript" />
               </div>
             </div>
-            <div className="flex gap-3 mt-5">
+            <div className="flex gap-3 mt-5 pt-2 border-t border-gray-100 flex-shrink-0">
               <button onClick={() => setShowExpModal(false)} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm text-[#555] hover:bg-gray-50 transition-all">Cancel</button>
               <button onClick={saveExp} className="flex-1 py-2.5 rounded-xl text-white text-sm font-semibold hover:opacity-90 transition-all" style={{ background: 'linear-gradient(92.62deg, #FA2329 0.91%, #B10D1C 99.09%)' }}>Save</button>
             </div>
@@ -615,3 +618,5 @@ const CandidateRegistration = () => {
 }
 
 export default CandidateRegistration
+
+

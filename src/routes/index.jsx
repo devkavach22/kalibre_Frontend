@@ -16,8 +16,10 @@ import Login from "../auth/Login";
 import ForgetPassword from "../auth/ForgetPassword";
 import ResumeUpload from "../pages/ResumeUpload";
 import CandidateDashbaord from "../pages/CandidateDashbaord";
-import JobDetailsPage from "../dashboards/JobDetailsPage"; 
+import JobDetailsPage from "../dashboards/JobDetailsPage";
 
+import HrRegister from "../dashboards/HrRegister"
+import HrDashboard from "../dashboards/HrDashboard";
 import MyProfile from "../dashboards/UserProfile"
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -46,17 +48,16 @@ const router = createBrowserRouter([
     ],
   },
 
-  // ✅ No Navbar/Footer — rendered outside <App />
   {
     path: "/candidates",
     element: <CandidateDashbaord />,
   },
-   {
+  {
     path: "/profile",
-    element: < MyProfile/>,
+    element: < MyProfile />,
   },
   {
-    path: "/candidates/job/:id",   // ← ADD THIS ROUTE
+    path: "/candidates/job/:id",
     element: <JobDetailsPage />,
   },
 
@@ -71,6 +72,14 @@ const router = createBrowserRouter([
   {
     path: "/forget-password",
     element: <PublicRoute><ForgetPassword /></PublicRoute>,
+  },
+    {
+    path: "/hr",
+    element: < HrRegister />,
+  },
+  {
+    path: "/hrDashbaord",
+    element: < HrDashboard />,
   },
 ]);
 
