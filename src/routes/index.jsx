@@ -16,6 +16,9 @@ import Login from "../auth/Login";
 import ForgetPassword from "../auth/ForgetPassword";
 import ResumeUpload from "../pages/ResumeUpload";
 import CandidateDashbaord from "../pages/CandidateDashbaord";
+import JobDetailsPage from "../dashboards/JobDetailsPage"; 
+
+import MyProfile from "../dashboards/UserProfile"
 
 // eslint-disable-next-line react-refresh/only-export-components
 const PublicRoute = ({ children }) => {
@@ -47,6 +50,14 @@ const router = createBrowserRouter([
   {
     path: "/candidates",
     element: <CandidateDashbaord />,
+  },
+   {
+    path: "/profile",
+    element: < MyProfile/>,
+  },
+  {
+    path: "/candidates/job/:id",   // ← ADD THIS ROUTE
+    element: <JobDetailsPage />,
   },
 
   {
