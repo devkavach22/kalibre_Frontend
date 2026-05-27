@@ -1,12 +1,14 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { parseResumeService, registerCandidateService } from "../services/resumeService";
+import { parseResumeService, registerCandidateService, getPublishedJobsService } from "../services/resumeService";
 
 const useResume = () => {
   const [loading, setLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
+  const [jobsLoading, setJobsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [resumeData, setResumeData] = useState(null);
+  const [jobs, setJobs] = useState([]);
 
   const parseResume = async (file) => {
     setLoading(true);
@@ -117,7 +119,24 @@ const useResume = () => {
     }
   };
 
-  return { parseResume, registerCandidate, resumeData, loading, submitLoading, error };
+  const getPublishedJobs = async () => {
+    setJobsLoading(true);
+    setError(null);
+    try {
+      const data = await getPublishedJobsService();
+      const jobList = Array.isArray(data) ? data : (data.jobs || data.data || []);
+      setJobs(jobList);
+      return jobList;
+    } catch (err) {
+      setError(err.message);
+      toast.error(err.message || "Failed to fetch jobs!");
+      return [];
+    } finally {
+      setJobsLoading(false);
+    }
+  };
+
+  return { parseResume, registerCandidate, getPublishedJobs, resumeData, jobs, loading, submitLoading, jobsLoading, error };
 };
 
 export default useResume;

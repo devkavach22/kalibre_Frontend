@@ -7,9 +7,15 @@ export const URLS = {
     RESET_PASSWORD: `${BASE_URL}/auth/reset-password`,
   },
   RESUME: {
-    PARSE: `${BASE_URL}/candidate/parse_resume`, 
+    PARSE: `${BASE_URL}/candidate/parse_resume`,
   },
   CANDIDATE: {
-  REGISTER: `${BASE_URL}/candidate/register`,
-},
+    REGISTER: `${BASE_URL}/candidate/register`,
+  },
+  JOBS: {
+    GET_PUBLISHED: `${BASE_URL}/get_published_jobs`,
+  },
+  RECRUITMENT: {
+    REGISTER: `${BASE_URL}/recruitment/register`,
+  },
 };

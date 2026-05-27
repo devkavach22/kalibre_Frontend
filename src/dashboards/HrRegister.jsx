@@ -1,6 +1,9 @@
-import React, { useState, useRef } from 'react'
+/* eslint-disable react-hooks/set-state-in-effect */
+import React, { useState, useRef, useEffect } from 'react'
 import AuthPick from "../assets/authpic.png"
 import Logo from "../assets/Logo.png"
+import toast from 'react-hot-toast'
+import useHr from '../APIs/hooks/useHr' 
 
 function SectionHeader({ icon, title }) {
   return (
@@ -17,19 +20,33 @@ function ErrMsg({ field, errors }) {
 
 export default function HrRegister() {
   const [logoPreview, setLogoPreview] = useState(null)
+  const [logoFileDetails, setLogoFileDetails] = useState({ base64: null, filename: '' })
   const [logoError, setLogoError] = useState('')
   const [idProof, setIdProof] = useState(null)
-  const [submitted, setSubmitted] = useState(false)
+  const [idProofDetails, setIdProofDetails] = useState({ base64: '', filename: '' })
   const logoRef = useRef()
+
+  // Custom Hook Initialized (submitted states removed as we direct navigate)
+  const { registerHr, loading } = useHr()
 
   const [form, setForm] = useState({
     companyName: '', companyEmail: '', companyPhone: '', websiteUrl: '', companyLocation: '',
     fullName: '', recruiterEmail: '', recruiterPhone: '', dob: '',
     preferredLocation: '', recruiterLocation: '', gender: 'male',
-    hiringType: '', requiredSkills: '', openPositions: '', minSalary: '', maxSalary: '',
-    experienceLevel: '', jobLocation: '',
     gstNumber: '', panNumber: '', businessRegNo: '',
   })
+
+  // useEffect to populate Recruiter Name and Email from LocalStorage
+  useEffect(() => {
+    const storedName = localStorage.getItem('user_name') || ''
+    const storedEmail = localStorage.getItem('email') || ''
+    
+    setForm(f => ({
+      ...f,
+      fullName: storedName,
+      recruiterEmail: storedEmail
+    }))
+  }, [])
 
   const [errors, setErrors] = useState({})
 
@@ -38,19 +55,51 @@ export default function HrRegister() {
     if (!['image/jpeg', 'image/png'].includes(file.type)) { setLogoError('Only JPG/PNG allowed'); return }
     if (file.size > 2 * 1024 * 1024) { setLogoError('Max 2MB allowed'); return }
     setLogoError('')
+    
     const reader = new FileReader()
-    reader.onload = (e) => setLogoPreview(e.target.result)
+    reader.onload = (e) => {
+      setLogoPreview(e.target.result)
+      const base64Str = e.target.result.split(',')[1]
+      setLogoFileDetails({
+        base64: base64Str,
+        filename: file.name
+      })
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const handleIdProofUpload = (file) => {
+    if (!file) return
+    if (file.size > 5 * 1024 * 1024) { alert('Max 5MB allowed'); return }
+    setIdProof(file)
+
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const base64Str = e.target.result.split(',')[1]
+      setIdProofDetails({
+        base64: base64Str,
+        filename: file.name
+      })
+    }
     reader.readAsDataURL(file)
   }
 
   const set = (field) => (e) => {
     let val = e.target.value
+    
+    if (field === 'companyEmail' || field === 'recruiterEmail') {
+      if (val.length === 1 && !/[a-zA-Z]/.test(val)) return;
+    }
+    
+    if (field === 'companyLocation' || field === 'recruiterLocation' || field === 'preferredLocation') {
+      val = val.replace(/[0-9]/g, '')
+    }
+
     if (field === 'companyName' || field === 'fullName') val = val.replace(/[0-9]/g, '')
     if (field === 'companyPhone' || field === 'recruiterPhone') val = val.replace(/\D/g, '').slice(0, 10)
     if (field === 'websiteUrl' && /^\d+$/.test(val)) return
     if (field === 'gstNumber') val = val.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 15)
     if (field === 'panNumber') val = val.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10)
-    if (field === 'openPositions') val = val.replace(/\D/g, '')
     setForm(f => ({ ...f, [field]: val }))
     setErrors(er => ({ ...er, [field]: '' }))
   }
@@ -62,7 +111,7 @@ export default function HrRegister() {
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.companyEmail)) errs.companyEmail = 'Invalid email'
     if (!form.companyPhone.trim()) errs.companyPhone = 'Required'
     else if (form.companyPhone.length !== 10) errs.companyPhone = 'Must be 10 digits'
-    if (form.websiteUrl && !/^https?:\/\/.+\..+/.test(form.websiteUrl)) errs.websiteUrl = 'Enter valid URL e.g. https://company.com'
+    if (form.websiteUrl && !/^https?:\/\/.+\..+/.test(form.websiteUrl)) errs.websiteUrl = 'Enter valid URL'
     if (!form.companyLocation.trim()) errs.companyLocation = 'Required'
     if (!form.fullName.trim()) errs.fullName = 'Required'
     if (!form.recruiterEmail.trim()) errs.recruiterEmail = 'Required'
@@ -71,22 +120,23 @@ export default function HrRegister() {
     else if (form.recruiterPhone.length !== 10) errs.recruiterPhone = 'Must be 10 digits'
     if (!form.dob) errs.dob = 'Required'
     if (!form.recruiterLocation.trim()) errs.recruiterLocation = 'Required'
-    if (!form.hiringType) errs.hiringType = 'Required'
-    if (!form.openPositions || +form.openPositions < 1) errs.openPositions = 'Enter valid number'
-    if (!form.minSalary) errs.minSalary = 'Required'
-    if (!form.maxSalary) errs.maxSalary = 'Required'
-    else if (+form.minSalary > +form.maxSalary) errs.maxSalary = 'Max must be >= Min'
-    if (!form.experienceLevel) errs.experienceLevel = 'Required'
-    if (!form.jobLocation.trim()) errs.jobLocation = 'Required'
     if (!form.gstNumber.trim()) errs.gstNumber = 'Required'
     if (!form.businessRegNo.trim()) errs.businessRegNo = 'Required'
+    
+    if (!idProofDetails.base64) {
+      toast.error("Please upload Company ID Proof document");
+      return false;
+    }
+
     setErrors(errs)
     return Object.keys(errs).length === 0
   }
 
-  const handleSubmit = () => {
-    if (validate()) setSubmitted(true)
-    else {
+  const handleSubmit = async () => {
+    if (validate()) {
+      await registerHr(form, logoFileDetails, idProofDetails);
+    } else {
+      toast.error("Please fill all required fields correctly");
       setTimeout(() => {
         const el = document.querySelector('[data-haserror="true"]')
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
@@ -94,36 +144,21 @@ export default function HrRegister() {
     }
   }
 
-  const inp = (field, extra = '') =>
-    `w-full px-3 py-2.5 border rounded-lg text-sm outline-none transition-all placeholder-gray-300 ${errors[field] ? 'border-red-400 bg-red-50 focus:ring-2 focus:ring-red-100' : 'border-gray-200 bg-white focus:border-[#C1272D] focus:ring-2 focus:ring-red-100'} ${extra}`
-
-  const sel = (field) =>
-    `w-full px-3 py-2.5 border rounded-lg text-sm outline-none transition-all appearance-none cursor-pointer bg-white ${errors[field] ? 'border-red-400 bg-red-50' : 'border-gray-200 focus:border-[#C1272D] focus:ring-2 focus:ring-red-100'}`
-
-  if (submitted) {
-    return (
-      <div className="min-h-screen bg-rose-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-xl p-6 md:p-12 text-center max-w-sm w-full">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-5">
-            <svg className="w-10 h-10 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <h2 className="text-2xl font-black text-gray-800 mb-2">Registration Submitted!</h2>
-          <p className="text-gray-400 text-sm mb-6">Your company registration has been received successfully.</p>
-          <button onClick={() => setSubmitted(false)} className="w-full sm:w-auto bg-[#C1272D] text-white px-8 py-3 rounded-xl font-bold hover:bg-[#a61f24] transition-colors">
-            Register Another
-          </button>
-        </div>
-      </div>
-    )
+  const inp = (field, extra = '') => {
+    const isFieldDisabled = field === 'fullName' || field === 'recruiterEmail';
+    return `w-full px-3 py-2.5 border rounded-lg text-sm outline-none transition-all placeholder-gray-300 ${
+      isFieldDisabled 
+        ? 'bg-white border-gray-200 text-black font-medium select-none' 
+        : errors[field] 
+          ? 'border-red-400 bg-red-50 focus:ring-2 focus:ring-red-100' 
+          : 'border-gray-200 bg-white focus:border-[#C1272D] focus:ring-2 focus:ring-red-100'
+    } ${extra}`;
   }
 
   const isCompanyDetailsDone = !!(form.companyName.trim() && form.companyEmail.trim() && form.companyPhone.trim() && form.companyLocation.trim())
   const isRecruiterDetailsDone = !!(form.fullName.trim() && form.recruiterEmail.trim() && form.recruiterPhone.trim() && form.dob)
-  const isHiringPreferencesDone = !!(form.hiringType && form.openPositions && form.minSalary && form.maxSalary && form.experienceLevel && form.jobLocation.trim())
-
-  const isTopThreeFilled = isCompanyDetailsDone && isRecruiterDetailsDone && isHiringPreferencesDone
+  
+  const isCoreDetailsDone = isCompanyDetailsDone && isRecruiterDetailsDone
 
   const filled = Object.values(form).filter(v => v && v.toString().trim() !== '').length
   const total = Object.keys(form).length
@@ -138,7 +173,6 @@ export default function HrRegister() {
           <p className="text-gray-400 text-sm mt-0.5">Complete Your Company Registration</p>
         </div>
 
-        {/* Global multi-device framework container breakdown layout */}
         <div className="bg-white rounded-3xl border border-gray-200/80 p-4 md:p-8 shadow-sm grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
 
           {/* LEFT FORM SECTION */}
@@ -213,14 +247,14 @@ export default function HrRegister() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div data-haserror={!!errors.fullName}>
                   <label className="block text-xs font-semibold text-gray-500 mb-1.5">Full Name <span className="text-red-400">*</span></label>
-                  <input className={inp('fullName')} placeholder="Enter your full name" value={form.fullName} onChange={set('fullName')} />
+                  <input className={inp('fullName')} placeholder="Enter your full name" value={form.fullName} onChange={set('fullName')} disabled />
                   <ErrMsg field="fullName" errors={errors} />
                 </div>
                 <div data-haserror={!!errors.recruiterEmail}>
                   <label className="block text-xs font-semibold text-gray-500 mb-1.5">Email Address <span className="text-red-400">*</span></label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 text-xs">✉</span>
-                    <input className={inp('recruiterEmail', 'pl-7')} placeholder="your.email@example.com" value={form.recruiterEmail} onChange={set('recruiterEmail')} />
+                    <input className={inp('recruiterEmail', 'pl-7')} placeholder="your.email@example.com" value={form.recruiterEmail} onChange={set('recruiterEmail')} disabled />
                   </div>
                   <ErrMsg field="recruiterEmail" errors={errors} />
                 </div>
@@ -268,64 +302,6 @@ export default function HrRegister() {
               </div>
             </div>
 
-            {/* HIRING PREFERENCES */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 md:p-5">
-              <SectionHeader icon="💼" title="Hiring Preferences" />
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div data-haserror={!!errors.hiringType}>
-                  <label className="block text-xs font-semibold text-gray-500 mb-1.5">Hiring Type <span className="text-red-400">*</span></label>
-                  <select className={sel('hiringType')} value={form.hiringType} onChange={set('hiringType')}>
-                    <option value="">Select hiring type</option>
-                    {['Full-time', 'Part-time', 'Contract', 'Internship', 'Freelance'].map(t => (
-                      <option key={t} value={t}>{t}</option>
-                    ))}
-                  </select>
-                  <ErrMsg field="hiringType" errors={errors} />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-gray-500 mb-1.5">Required Skills</label>
-                  <input className={inp('requiredSkills')} placeholder="e.g. PHP, React, Node.js" value={form.requiredSkills} onChange={set('requiredSkills')} />
-                </div>
-                <div data-haserror={!!errors.openPositions}>
-                  <label className="block text-xs font-semibold text-gray-500 mb-1.5">Number of Open Positions <span className="text-red-400">*</span></label>
-                  <input className={inp('openPositions')} placeholder="Enter number of positions" value={form.openPositions} onChange={set('openPositions')} inputMode="numeric" />
-                  <ErrMsg field="openPositions" errors={errors} />
-                </div>
-                <div data-haserror={!!errors.minSalary || !!errors.maxSalary}>
-                  <label className="block text-xs font-semibold text-gray-500 mb-1.5">Salary Range (per annum) <span className="text-red-400">*</span></label>
-                  {/* Made responsive: flex-col on mobile transforms to individual rows, sm:flex-row handles desktop */}
-                  <div className="flex flex-col sm:flex-row gap-2">
-                    <div className="w-full sm:flex-1">
-                      <input type="number" className={inp('minSalary')} placeholder="Min. Salary" value={form.minSalary} onChange={set('minSalary')} />
-                      <ErrMsg field="minSalary" errors={errors} />
-                    </div>
-                    <div className="w-full sm:flex-1">
-                      <input type="number" className={inp('maxSalary')} placeholder="Max. Salary" value={form.maxSalary} onChange={set('maxSalary')} />
-                      <ErrMsg field="maxSalary" errors={errors} />
-                    </div>
-                  </div>
-                </div>
-                <div data-haserror={!!errors.experienceLevel}>
-                  <label className="block text-xs font-semibold text-gray-500 mb-1.5">Experience Level <span className="text-red-400">*</span></label>
-                  <select className={sel('experienceLevel')} value={form.experienceLevel} onChange={set('experienceLevel')}>
-                    <option value="">Select Experience Level</option>
-                    {['Fresher (0-1 yr)', 'Junior (1-3 yrs)', 'Mid (3-5 yrs)', 'Senior (5-8 yrs)', 'Lead (8+ yrs)'].map(e => (
-                      <option key={e} value={e}>{e}</option>
-                    ))}
-                  </select>
-                  <ErrMsg field="experienceLevel" errors={errors} />
-                </div>
-                <div data-haserror={!!errors.jobLocation}>
-                  <label className="block text-xs font-semibold text-gray-500 mb-1.5">Job Location <span className="text-red-400">*</span></label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 text-xs">📍</span>
-                    <input className={inp('jobLocation', 'pl-8')} placeholder="Enter job location" value={form.jobLocation} onChange={set('jobLocation')} />
-                  </div>
-                  <ErrMsg field="jobLocation" errors={errors} />
-                </div>
-              </div>
-            </div>
-
             {/* VERIFICATION */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 md:p-5">
               <SectionHeader icon="🛡️" title="Verification" />
@@ -356,13 +332,9 @@ export default function HrRegister() {
                       </span>
                     </div>
                     <label className="bg-[#C1272D] hover:bg-[#a61f24] text-white text-sm font-semibold px-4 py-2.5 cursor-pointer transition-colors whitespace-nowrap text-center">
-                      select file
-                      <input type="file" accept=".pdf,image/jpeg,image/png" className="hidden"
-                        onChange={e => {
-                          const f = e.target.files[0]
-                          if (f && f.size > 5 * 1024 * 1024) { alert('Max 5MB allowed'); return }
-                          setIdProof(f)
-                        }} />
+                      {loading ? 'Processing...' : 'select file'}
+                      <input type="file" accept=".pdf,image/jpeg,image/png" className="hidden" disabled={loading}
+                        onChange={e => handleIdProofUpload(e.target.files[0])} />
                     </label>
                   </div>
                 </div>
@@ -371,37 +343,37 @@ export default function HrRegister() {
 
             {/* SUBMIT BAR */}
             <div className={`border rounded-2xl p-4 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between transition-all duration-300 ${
-              isTopThreeFilled 
+              isCoreDetailsDone 
                 ? 'bg-green-50 border-green-200' 
                 : 'bg-gray-50/80 border-gray-200 opacity-70'
             }`}>
               <div className="flex items-center gap-3">
                 <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-300 ${
-                  isTopThreeFilled ? 'bg-green-500' : 'bg-gray-300'
+                  isCoreDetailsDone ? 'bg-green-500' : 'bg-gray-300'
                 }`}>
                   <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
                 <div>
-                  <p className={`font-bold text-sm transition-colors duration-300 ${isTopThreeFilled ? 'text-green-700' : 'text-gray-500'}`}>
-                    Almost Done!
+                  <p className={`font-bold text-sm transition-colors duration-300 ${isCoreDetailsDone ? 'text-green-700' : 'text-gray-500'}`}>
+                    {loading ? 'Submitting Registration...' : 'Almost Done!'}
                   </p>
-                  <p className={`text-xs transition-colors duration-300 ${isTopThreeFilled ? 'text-green-600' : 'text-gray-400'}`}>
-                    {isTopThreeFilled ? 'Please review your details before submitting.' : 'Complete Details, Recruiters & Hiring Preferences to unlock.'}
+                  <p className={`text-xs transition-colors duration-300 ${isCoreDetailsDone ? 'text-green-600' : 'text-gray-400'}`}>
+                    {isCoreDetailsDone ? 'Please review your details before submitting.' : 'Complete Details & Recruiters settings to unlock.'}
                   </p>
                 </div>
               </div>
               <button
                 onClick={handleSubmit}
-                disabled={!isTopThreeFilled}
+                disabled={!isCoreDetailsDone || loading}
                 className={`w-full sm:w-auto text-center font-bold px-7 py-2.5 rounded-xl text-sm transition-all duration-300 ${
-                  isTopThreeFilled 
+                  isCoreDetailsDone && !loading
                     ? 'bg-[#C1272D] text-white hover:bg-[#a61f24] active:scale-95 shadow-md shadow-red-200 cursor-pointer' 
                     : 'bg-gray-200 text-gray-400 cursor-not-allowed opacity-60'
                 }`}
               >
-                Review &amp; Submit
+                {loading ? 'Please Wait...' : 'Review & Submit'}
               </button>
             </div>
 
@@ -441,7 +413,6 @@ export default function HrRegister() {
               {[
                 { label: 'Company Details', done: isCompanyDetailsDone },
                 { label: 'Recruiter Details', done: isRecruiterDetailsDone },
-                { label: 'Hiring Preferences', done: isHiringPreferencesDone },
                 { label: 'Verification', done: !!(form.gstNumber && form.businessRegNo) },
                 { label: 'Review & Submit', done: false },
               ].map((s, i) => (
@@ -458,6 +429,3 @@ export default function HrRegister() {
     </div>
   )
 }
-
-
-

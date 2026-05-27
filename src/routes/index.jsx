@@ -31,7 +31,7 @@ const PublicRoute = ({ children }) => {
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,
+    element: <App />, // Yahan sirf wahi pages aayenge jisme Navbar + Footer chahiye
     children: [
       { index: true, element: <LandingPage /> },
       { path: "/about", element: <AboutUs /> },
@@ -44,10 +44,14 @@ const router = createBrowserRouter([
       { path: "/manpower", element: <Service2 /> },
       { path: "/remote-staffing", element: <Service3 /> },
       { path: "/rpo", element: <Service4 /> },
-      { path: "/resume/upload", element: <ResumeUpload /> },
     ],
   },
 
+  // Independent Pages (Yahan na Navbar dikhega, na Footer)
+  {
+    path: "/resume/upload",
+    element: <ResumeUpload />,
+  },
   {
     path: "/candidates",
     element: <CandidateDashbaord />,
@@ -61,6 +65,7 @@ const router = createBrowserRouter([
     element: <JobDetailsPage />,
   },
 
+  // Auth Routes
   {
     path: "/register",
     element: <PublicRoute><Register /></PublicRoute>,
@@ -73,7 +78,7 @@ const router = createBrowserRouter([
     path: "/forget-password",
     element: <PublicRoute><ForgetPassword /></PublicRoute>,
   },
-    {
+  {
     path: "/hr",
     element: < HrRegister />,
   },

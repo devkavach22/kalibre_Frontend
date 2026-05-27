@@ -6,7 +6,6 @@ import Footer from "./components/Footer";
 function App() {
   const location = useLocation();
   const isContactPage = location.pathname === "/contact";
-  const hideFooter = location.pathname === "/resume/upload"; 
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -15,8 +14,10 @@ function App() {
   return (
     <div>
       <Navbar />
+      
       <Outlet />
-      {!hideFooter && <Footer isContactPage={isContactPage} />} 
+      
+      <Footer isContactPage={isContactPage} /> 
     </div>
   );
 }

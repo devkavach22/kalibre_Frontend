@@ -24,7 +24,6 @@ const useAuth = () => {
         role: formData.role || "candidate",
       };
       await registerUser(payload);
-      // ✅ Token save nahi kar rahe — warna PublicRoute /login pe aane nahi deta
       toast.success("Account created successfully!");
       navigate("/login");
     } catch (err) {
@@ -35,29 +34,97 @@ const useAuth = () => {
     }
   };
 
+
+
+  // const login = async (formData) => {
+  //   setLoading(true);
+  //   setError(null);
+  //   try {
+  //     const payload = {
+  //       email: formData.email,
+  //       password: formData.password,
+  //       role: formData.role || "candidate",
+  //     };
+  //     const data = await loginUser(payload);
+  //     if (data.token) {
+  //       localStorage.setItem("token", data.token);
+  //       localStorage.setItem("user_name", data.user_name);
+  //       localStorage.setItem("email", data.email);
+  //       localStorage.setItem("user_type", data.user_type);
+  //       localStorage.setItem(
+  //         "candidate_registration_done",
+  //         data.candidate_registration_done
+  //       );
+  //       localStorage.setItem(
+  //         "recruiter_registration_done",
+  //         data.recruiter_registration_done
+  //       );
+  //     }
+  //     toast.success("Logged in successfully!");
+  //     navigate("/resume/upload");
+  //   } catch (err) {
+  //     setError(err.message);
+  //     toast.error(err.message || "Login failed!");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const login = async (formData) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const payload = {
-        email: formData.email,
-        password: formData.password,
-        role: formData.role || "candidate",
-      };
-      const data = await loginUser(payload);
-      if (data.token) {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user_name", data.user_name);
-      }
+  setLoading(true);
+  setError(null);
+  try {
+    const payload = {
+      email: formData.email,
+      password: formData.password,
+      role: formData.role || "candidate",
+    };
+    const data = await loginUser(payload);
+    
+    if (data.token) {
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user_name", data.user_name || "");
+      localStorage.setItem("email", data.email || "");
+      localStorage.setItem("user_type", data.user_type);
+      localStorage.setItem(
+        "candidate_registration_done",
+        data.candidate_registration_done
+      );
+      localStorage.setItem(
+        "recruiter_registration_done",
+        data.recruiter_registration_done
+      );
+
       toast.success("Logged in successfully!");
-      navigate("/resume/upload");
-    } catch (err) {
-      setError(err.message);
-      toast.error(err.message || "Login failed!");
-    } finally {
-      setLoading(false);
+
+      
+      const isRecruiterDone = data.recruiter_registration_done === true || data.recruiter_registration_done === "true";
+      const isCandidateDone = data.candidate_registration_done === true || data.candidate_registration_done === "true";
+
+      if (data.user_type === "recruiter") {
+        if (isRecruiterDone) {
+          navigate("/hrDashbaord");
+        } else {
+          navigate("/hr");
+        }
+      } else if (data.user_type === "candidate") {
+        if (isCandidateDone) {
+          // Agar bada form ho chuka hai
+          navigate("/candidates");
+        } else {
+          navigate("/resume/upload");
+        }
+      } else {
+        navigate("/");
+      }
     }
-  };
+  } catch (err) {
+    setError(err.message);
+    toast.error(err.message || "Login failed!");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const forgotPassword = async (email) => {
     setLoading(true);
