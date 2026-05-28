@@ -186,8 +186,9 @@ const CandidateRegistration = () => {
       toast.error("Please fill total experience!")
       return
     }
-    const result = await registerCandidate({ formData, gender, skills, education, experience, resumeFile })
-    if (result) navigate("/candidates")
+    
+    // Custom hook hooks se token aur routing internally directly manage ho rahi hai
+    await registerCandidate({ formData, gender, skills, education, experience, resumeFile })
   }
 
   const inputClass = "w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm text-[#333] placeholder-gray-400 outline-none focus:border-[#C8102E] focus:ring-1 focus:ring-[#C8102E]/20 transition-all duration-200 bg-white"
@@ -618,5 +619,3 @@ const CandidateRegistration = () => {
 }
 
 export default CandidateRegistration
-
-

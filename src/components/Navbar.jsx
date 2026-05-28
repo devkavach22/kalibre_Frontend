@@ -18,10 +18,16 @@ function Navbar() {
 
   const token = localStorage.getItem("token");
   const userName = localStorage.getItem("user_name");
+  const userType = localStorage.getItem("user_type"); // 👈 Sahi key lagayi aapke Local Storage ke hisab se
+
+  // ✅ Sahi checking lagayi: agar 'hr' ya 'recruiter' ho toh /hrDashbaord jaye
+  const isHR = userType?.toLowerCase() === "hr" || userType?.toLowerCase() === "recruiter";
+  const dashboardLink = isHR ? "/hrDashbaord" : "/candidates";
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user_name");
+    localStorage.removeItem("user_type"); // 👈 Sahi key clear ki
     window.location.href = "/";
   };
 
@@ -38,7 +44,6 @@ function Navbar() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
         .navbar-root { font-family: 'Poppins', sans-serif; }
         .hire-btn { background: #C8102E; transition: background 0.2s, transform 0.15s; }
         .hire-btn:hover { background: #a50d25; transform: scale(1.03); }
@@ -57,16 +62,14 @@ function Navbar() {
           to   { opacity: 1; transform: translateY(0); }
         }
 
-      .user-dropdown {
-  position: absolute; top: calc(100% + 2px); right: 0;
-  background: white; border-radius: 16px; min-width: 200px;
-  box-shadow: 0px 8px 30px rgba(200,16,46,0.15), 0px 2px 8px rgba(0,0,0,0.08);
-  overflow: hidden; z-index: 100;
-  border: 1px solid #FFE0E4;
-  animation: slideDown 0.2s ease forwards;
-}
-
-
+        .user-dropdown {
+          position: absolute; top: calc(100% + 2px); right: 0;
+          background: white; border-radius: 16px; min-width: 200px;
+          box-shadow: 0px 8px 30px rgba(200,16,46,0.15), 0px 2px 8px rgba(0,0,0,0.08);
+          overflow: hidden; z-index: 100;
+          border: 1px solid #FFE0E4;
+          animation: slideDown 0.2s ease forwards;
+        }
       `}</style>
 
       <header className="navbar-root fixed top-0 left-0 right-0 z-50 px-6 md:px-10 pt-[20px]">
@@ -76,7 +79,7 @@ function Navbar() {
         >
 
           {/* Logo */}
-          <a href="#" className="flex-shrink-0">
+          <a href="/" className="flex-shrink-0">
             <img src={Logo} alt="Kalibre" className="h-10 md:h-11 w-auto object-contain" />
           </a>
 
@@ -97,34 +100,44 @@ function Navbar() {
           {/* Right buttons */}
           <div className="hidden lg:flex items-center gap-3">
             {token ? (
-              <div className="relative" ref={dropdownRef}>
-                <button
-                  onClick={() => setDropdownOpen((p) => !p)}
-                  className="login-btn flex items-center gap-2 font-semibold text-[14px] px-5 py-2.5 rounded-full"
+              <>
+                {/* Dashboard Button */}
+                <a
+                  href={dashboardLink}
+                  className="hire-btn flex items-center gap-2 text-white font-semibold text-[14px] px-6 py-2.5 rounded-full"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                  {userName}
-                  <svg xmlns="http://www.w3.org/2000/svg" className={`h-3.5 w-3.5 transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
+                  Dashboard
+                </a>
 
-                {dropdownOpen && (
-                  <div className="user-dropdown">
-                    <button
-                      onClick={handleLogout}
-                      className="w-full flex items-center gap-2 px-5 py-3.5 text-[14px] font-semibold text-[#C8102E] hover:bg-[#FFF0F0] transition-colors duration-200"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1" />
-                      </svg>
-                      Logout
-                    </button>
-                  </div>
-                )}
-              </div>
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    onClick={() => setDropdownOpen((p) => !p)}
+                    className="login-btn flex items-center gap-2 font-semibold text-[14px] px-5 py-2.5 rounded-full"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    {userName}
+                    <svg xmlns="http://www.w3.org/2000/svg" className={`h-3.5 w-3.5 transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+
+                  {dropdownOpen && (
+                    <div className="user-dropdown">
+                      <button
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-2 px-5 py-3.5 text-[14px] font-semibold text-[#C8102E] hover:bg-[#FFF0F0] transition-colors duration-200"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1" />
+                        </svg>
+                        Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </>
             ) : (
               <a
                 href="/register"
@@ -137,7 +150,7 @@ function Navbar() {
               </a>
             )}
 
-            {/* Hire Talent — untouched */}
+            {/* Hire Talent */}
             <a
               href="/register"
               className="hire-btn flex items-center gap-2 text-white font-semibold text-[14px] px-6 py-2.5 rounded-full"
@@ -180,21 +193,25 @@ function Navbar() {
               ))}
               <li className="flex flex-wrap gap-3 pt-2">
                 {token ? (
-                  <button
-                    onClick={handleLogout}
-                    className="login-btn inline-flex items-center gap-2 font-semibold text-[14px] px-5 py-2.5 rounded-full"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1" />
-                    </svg>
-                    {userName} — Logout
-                  </button>
+                  <>
+                    <a href={dashboardLink} className="hire-btn inline-flex items-center gap-2 text-white font-semibold text-[14px] px-6 py-2.5 rounded-full">
+                      Dashboard
+                    </a>
+                    <button
+                      onClick={handleLogout}
+                      className="login-btn inline-flex items-center gap-2 font-semibold text-[14px] px-5 py-2.5 rounded-full"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1" />
+                      </svg>
+                      {userName} — Logout
+                    </button>
+                  </>
                 ) : (
                   <a href="/login" className="login-btn inline-flex items-center gap-2 font-semibold text-[14px] px-5 py-2.5 rounded-full">
                     Login
                   </a>
                 )}
-                {/* Hire Talent — untouched */}
                 <a href="/register" className="hire-btn inline-flex items-center gap-2 text-white font-semibold text-[14px] px-6 py-2.5 rounded-full">
                   Hire Talent
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>

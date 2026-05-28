@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import App from "../App";
 import LandingPage from "../pages/LandingPage";
@@ -22,16 +23,39 @@ import HrRegister from "../dashboards/HrRegister"
 import HrDashboard from "../dashboards/HrDashboard";
 import MyProfile from "../dashboards/UserProfile"
 
+
 // eslint-disable-next-line react-refresh/only-export-components
 const PublicRoute = ({ children }) => {
   const token = localStorage.getItem("token");
   return token ? <Navigate to="/" replace /> : children;
 };
 
+
+const ProtectedRouteHR = ({ children }) => {
+  const token = localStorage.getItem("token");
+  const userType = localStorage.getItem("user_type");
+  const isHR = userType?.toLowerCase() === "hr" || userType?.toLowerCase() === "recruiter";
+
+  if (!token) return <Navigate to="/login" replace />;
+  if (!isHR) return <Navigate to="/" replace />; 
+  return children;
+};
+
+
+const ProtectedRouteCandidate = ({ children }) => {
+  const token = localStorage.getItem("token");
+  const userType = localStorage.getItem("user_type");
+  const isHR = userType?.toLowerCase() === "hr" || userType?.toLowerCase() === "recruiter";
+
+  if (!token) return <Navigate to="/login" replace />;
+  if (isHR) return <Navigate to="/" replace />; 
+  return children;
+};
+
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />, // Yahan sirf wahi pages aayenge jisme Navbar + Footer chahiye
+    element: <App />, 
     children: [
       { index: true, element: <LandingPage /> },
       { path: "/about", element: <AboutUs /> },
@@ -47,22 +71,21 @@ const router = createBrowserRouter([
     ],
   },
 
-  // Independent Pages (Yahan na Navbar dikhega, na Footer)
   {
     path: "/resume/upload",
-    element: <ResumeUpload />,
+    element: <PublicRoute><ResumeUpload /></PublicRoute>,
   },
   {
     path: "/candidates",
-    element: <CandidateDashbaord />,
+    element: <ProtectedRouteCandidate><CandidateDashbaord /></ProtectedRouteCandidate>,
   },
   {
     path: "/profile",
-    element: < MyProfile />,
+    element: <ProtectedRouteCandidate><MyProfile /></ProtectedRouteCandidate>,
   },
   {
     path: "/candidates/job/:id",
-    element: <JobDetailsPage />,
+    element: <ProtectedRouteCandidate><JobDetailsPage /></ProtectedRouteCandidate>,
   },
 
   // Auth Routes
@@ -80,11 +103,12 @@ const router = createBrowserRouter([
   },
   {
     path: "/hr",
-    element: < HrRegister />,
+    element: <PublicRoute><HrRegister /></PublicRoute>, 
   },
+
   {
     path: "/hrDashbaord",
-    element: < HrDashboard />,
+    element: <ProtectedRouteHR><HrDashboard /></ProtectedRouteHR>,
   },
 ]);
 

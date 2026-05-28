@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom"; 
 import toast from "react-hot-toast";
 import { parseResumeService, registerCandidateService, getPublishedJobsService } from "../services/resumeService";
 
 const useResume = () => {
+  const navigate = useNavigate(); 
   const [loading, setLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [jobsLoading, setJobsLoading] = useState(false);
@@ -37,58 +39,58 @@ const useResume = () => {
   };
 
   const parseDate = (dateStr) => {
-    if (!dateStr) return { month: "", year: "" };
+    if (!dateStr) return { month: "", year: "" }; // Fixed backslash
     const months = {
-      Jan:"01", Feb:"02", Mar:"03", Apr:"04", May:"05", Jun:"06",
-      Jul:"07", Aug:"08", Sep:"09", Oct:"10", Nov:"11", Dec:"12",
-      January:"01", February:"02", March:"03", April:"04", June:"06",
-      July:"07", August:"08", September:"09", October:"10", November:"11", December:"12",
+      Jan: "01", Feb: "02", Mar: "03", Apr: "04", May: "05", Jun: "06",
+      Jul: "07", Aug: "08", Sep: "09", Oct: "10", Nov: "11", Dec: "12"
     };
-    const parts = dateStr.trim().split(" ");
-    return { month: months[parts[0]] || "", year: parts[1] || "" };
+    const parts = dateStr.split(" ");
+    if (parts.length >= 2) {
+      return { month: months[parts[0]] || "01", year: parts[1] };
+    }
+    return { month: "01", year: dateStr };
   };
 
-  const registerCandidate = async ({ formData, gender, skills, education, experience, resumeFile }) => {
+  const registerCandidate = async (formData, education, experience, resumeFile, resumeName) => {
     setSubmitLoading(true);
     setError(null);
     try {
-      let resumeBase64 = "";
-      let resumeName = "";
+      let resumeBase64 = null;
       if (resumeFile) {
         resumeBase64 = await fileToBase64(resumeFile);
-        resumeName = resumeFile.name;
       }
 
       const payload = {
-        name: formData.fullName,
-        email: formData.email,
-        phone: formData.phone,
-        dob: formData.dob,
-        gender: gender.toLowerCase(),
-        current_location: formData.currentLocation,
-        preferred_location: formData.preferredLocation,
-        total_experience: parseFloat(formData.totalExperience) || 0,
-        current_ctc: parseFloat(formData.currentCTC) || 0,
-        expected_ctc: parseFloat(formData.expectedCTC) || 0,
-        notice_period_in_days: parseInt(formData.noticePeriod) || 0,
-        skills: skills,
-
-        // ✅ Education payload now includes course, specialization, board
-        education: education.map((edu) => ({
+        personal_details: {
+          name: formData.fullName,
+          email: formData.email,
+          phone: formData.phone,
+          dob: formData.dob,
+          gender: formData.gender || "Male",
+          preferred_location: formData.preferredLocation || "",
+          current_location: formData.currentLocation || "",
+        },
+        professional_details: {
+          total_experience: formData.totalExperience || "",
+          current_ctc: formData.currentCTC || "",
+          expected_ctc: formData.expectedCTC || "",
+          notice_period: formData.noticePeriod || "",
+          skills: formData.skills ? formData.skills.split(",").map(s => s.trim()) : [],
+        },
+        education_details: education.map((edu) => ({
           degree: edu.degree,
-          institute: edu.institute,
-          passing_year: edu.years,
-          course_type: edu.type.toLowerCase().replace(" ", "_"),
-          course: edu.course || "",
-          specialization: edu.specialization || "",
-          board: edu.board || "",
+          field_of_study: edu.field,
+          college_or_university: edu.college,
+          passing_year: edu.year,
+          percentage_or_cgpa: edu.grade,
         })),
-
-        experience: experience.map((exp) => {
-          const parts = exp.period?.split("–").map((s) => s.trim()) || [];
+        experience_details: experience.map((exp) => {
+          const duration = exp.duration || "";
+          const parts = duration.split("–").map(p => p.trim());
           const fromDate = parts[0] || "";
           const toDate = parts[1] || "";
-          const isCurrent = !toDate || toDate.toLowerCase().includes("present");
+          const isCurrent = toDate.toLowerCase() === "present";
+
           const from = parseDate(fromDate);
           const to = parseDate(toDate);
           return {
@@ -96,19 +98,25 @@ const useResume = () => {
             company_name: exp.company,
             joining_date_from_month: from.month,
             joining_date_from_year: from.year,
-            joining_date_to_month: isCurrent ? "" : to.month,
-            joining_date_to_year: isCurrent ? "" : to.year,
+            joining_date_to_month: isCurrent ? "" : to.month, // Fixed backslash
+            joining_date_to_year: isCurrent ? "" : to.year,   // Fixed backslash
             current_employment: isCurrent ? "yes" : "no",
             skills_used: exp.skills,
           };
         }),
-
         resume: resumeBase64,
         resume_name: resumeName,
       };
 
       const data = await registerCandidateService(payload);
       toast.success("Candidate registered successfully!");
+
+      // TKN REMOVE: Clear token to bypass PublicRoute restriction
+      localStorage.removeItem("token");
+
+      // Redirect to Login Page
+      navigate("/login");
+
       return data;
     } catch (err) {
       setError(err.message);
@@ -136,7 +144,7 @@ const useResume = () => {
     }
   };
 
-  return { parseResume, registerCandidate, getPublishedJobs, resumeData, jobs, loading, submitLoading, jobsLoading, error };
+  return { parseResume, registerCandidate, getPublishedJobs, loading, submitLoading, jobsLoading, error, resumeData, jobs };
 };
 
 export default useResume;
