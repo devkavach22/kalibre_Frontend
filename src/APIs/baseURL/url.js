@@ -1,4 +1,5 @@
 const BASE_URL = "http://192.168.11.62:7788/api";
+
 export const URLS = {
   AUTH: {
     SIGNUP: `${BASE_URL}/auth/signup`,
@@ -14,8 +15,15 @@ export const URLS = {
   },
   JOBS: {
     GET_PUBLISHED: `${BASE_URL}/get_published_jobs`,
+    GET_RECRUITER_JOBS: `${BASE_URL}/get_recruiter_jobs`, 
   },
   RECRUITMENT: {
     REGISTER: `${BASE_URL}/recruitment/register`,
+  },
+  JOBS_MANAGEMENT: {
+    CREATE_JOB: `${BASE_URL}/create_job_position`,
+    CREATE_DEPARTMENT: `${BASE_URL}/create_department`,
+    GET_DEPARTMENTS: `${BASE_URL}/get_departments`,
+    GET_LANGUAGES: `${BASE_URL}/get_languages`,
   },
 };

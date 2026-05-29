@@ -1,13 +1,9 @@
-// src/utils/apiClient.js
-import { URLS } from "../baseURL/url";
-
 const apiClient = async (endpoint, options = {}) => {
   const token = localStorage.getItem("token");
-
   const headers = { ...options.headers };
 
   if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
+    headers["Authorization"] = token;
   }
 
   if (options.body && !(options.body instanceof FormData)) {
@@ -23,7 +19,10 @@ const apiClient = async (endpoint, options = {}) => {
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.message || "Something went wrong");
+    const error = new Error(data.message || "Something went wrong");
+    error.status = response.status;
+    error.data = data;
+    throw error;
   }
 
   return data;

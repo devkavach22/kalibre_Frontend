@@ -1,0 +1,53 @@
+{
+"job_details": {
+"name": "Full Stack Python Developer",
+"client_selection": "NextGen Innovators Pvt Ltd",
+"department_ids": [452],
+"location": "Mumbai, Maharashtra",
+"experience_from": 3.0,
+"experience_to": 6.0,
+"budget_from": 10.0,
+"budget_to": 16.0,
+"no_of_recruitment": 5,
+"gender": "any"
+},
+
+"candidate_preferences": {
+"language_id": 1,
+"skills": "Python, Django, Odoo, React, PostgreSQL, Docker",
+"certifications": "Not mandatory",
+"required_qualifications": "B.E./B.Tech in Computer Science or IT."
+},
+
+"screening_questions": {
+"screening_notice_period": "30 days",
+"screening_immediate_joining": true,
+"screening_relocation_preference": true,
+"screening_work_authorization": true,
+"screening_questions": [
+"Have you created custom Odoo modules from scratch?",
+"Can you explain your experience with Docker and containerization?",
+"Are you comfortable working on both frontend and backend?"
+]
+},
+
+"job_description": {
+"about_the_role": "A great opportunity for a mid-level Python developer to work on cutting-edge enterprise applications.",
+"key_responsibilities": "1. Write clean, maintainable Python code.\n2. Develop APIs and integrate with third-party services.\n3. Participate in code reviews and architectural discussions."
+},
+
+"communication_preferences": {
+"comm_email": true,
+"comm_sms": true,
+"comm_whatsapp": true,
+"comm_reminders": true,
+},
+
+"company_details": {
+"company_overview": "NextGen Innovators is a forward-thinking IT consulting firm helping businesses digitally transform.",
+"company_logo": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+"company_email": "hr@nextgeninnovators.in",
+"company_website": "https://www.nextgeninnovators.in",
+"company_phone": "+91 8899001122"
+}
+}

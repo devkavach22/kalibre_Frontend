@@ -18,16 +18,15 @@ function Navbar() {
 
   const token = localStorage.getItem("token");
   const userName = localStorage.getItem("user_name");
-  const userType = localStorage.getItem("user_type"); // 👈 Sahi key lagayi aapke Local Storage ke hisab se
+  const userType = localStorage.getItem("user_type"); 
 
-  // ✅ Sahi checking lagayi: agar 'hr' ya 'recruiter' ho toh /hrDashbaord jaye
   const isHR = userType?.toLowerCase() === "hr" || userType?.toLowerCase() === "recruiter";
   const dashboardLink = isHR ? "/hrDashbaord" : "/candidates";
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user_name");
-    localStorage.removeItem("user_type"); // 👈 Sahi key clear ki
+    localStorage.removeItem("user_type"); 
     window.location.href = "/";
   };
 
@@ -97,11 +96,9 @@ function Navbar() {
             ))}
           </ul>
 
-          {/* Right buttons */}
           <div className="hidden lg:flex items-center gap-3">
             {token ? (
               <>
-                {/* Dashboard Button */}
                 <a
                   href={dashboardLink}
                   className="hire-btn flex items-center gap-2 text-white font-semibold text-[14px] px-6 py-2.5 rounded-full"
@@ -150,7 +147,6 @@ function Navbar() {
               </a>
             )}
 
-            {/* Hire Talent */}
             <a
               href="/register"
               className="hire-btn flex items-center gap-2 text-white font-semibold text-[14px] px-6 py-2.5 rounded-full"
@@ -162,7 +158,6 @@ function Navbar() {
             </a>
           </div>
 
-          {/* Hamburger */}
           <button
             className="lg:hidden flex flex-col justify-center items-center gap-[5px] w-10 h-10 rounded-full"
             onClick={() => setMenuOpen((p) => !p)}
