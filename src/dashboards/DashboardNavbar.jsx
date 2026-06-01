@@ -38,7 +38,7 @@ function DashboardNavbar() {
             {/* Profile Dropdown */}
             <div className="absolute right-0 top-10 w-40 bg-white rounded-xl shadow-lg border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
               <Link
-                to="/candidates/profile"
+                to="/profile"
                 className="block px-4 py-2.5 text-sm text-gray-700 hover:text-[#C8102E] hover:bg-red-50 rounded-t-xl transition-colors"
               >
                 My Profile

@@ -34,9 +34,16 @@ export const getLanguagesService = async () => {
   });
 };
 
-// Naya Service Function Recruiter Jobs List Fetch karne ke liye
+
 export const getRecruiterJobsService = async () => {
   return apiClient(URLS.JOBS.GET_RECRUITER_JOBS, {
     method: "GET",
+  });
+};
+
+export const publishJobService = async (job_position_id) => {
+  return apiClient(URLS.JOBS_MANAGEMENT.PUBLISH_JOB, {
+    method: "POST",
+    body: JSON.stringify({ job_position_id, is_published: true }),
   });
 };

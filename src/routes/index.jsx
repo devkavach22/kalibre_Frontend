@@ -34,7 +34,9 @@ const PublicRoute = ({ children }) => {
 const ProtectedRouteHR = ({ children }) => {
   const token = localStorage.getItem("token");
   const userType = localStorage.getItem("user_type");
-  const isHR = userType?.toLowerCase() === "hr" || userType?.toLowerCase() === "recruiter";
+  const isHR =
+    userType?.toLowerCase() === "hr" ||
+    userType?.toLowerCase() === "recruiter";
 
   if (!token) return <Navigate to="/login" replace />;
   if (!isHR) return <Navigate to="/" replace />;
@@ -44,14 +46,15 @@ const ProtectedRouteHR = ({ children }) => {
 const ProtectedRouteCandidate = ({ children }) => {
   const token = localStorage.getItem("token");
   const userType = localStorage.getItem("user_type");
-  const isHR = userType?.toLowerCase() === "hr" || userType?.toLowerCase() === "recruiter";
+  const isHR =
+    userType?.toLowerCase() === "hr" ||
+    userType?.toLowerCase() === "recruiter";
 
   if (!token) return <Navigate to="/login" replace />;
   if (isHR) return <Navigate to="/" replace />;
   return children;
 };
 
-// ✅ NEW - Employer Route Guard
 const ProtectedRouteEmployer = ({ children }) => {
   const token = localStorage.getItem("token");
   const userType = localStorage.getItem("user_type");
@@ -59,6 +62,13 @@ const ProtectedRouteEmployer = ({ children }) => {
 
   if (!token) return <Navigate to="/login" replace />;
   if (!isEmployer) return <Navigate to="/" replace />;
+  return children;
+};
+
+// ✅ NEW — allows ANY logged-in user (candidate, HR, recruiter, employer)
+const ProtectedRouteAny = ({ children }) => {
+  const token = localStorage.getItem("token");
+  if (!token) return <Navigate to="/login" replace />;
   return children;
 };
 
@@ -91,10 +101,13 @@ const router = createBrowserRouter([
     path: "/candidates",
     element: <ProtectedRouteCandidate><CandidateDashbaord /></ProtectedRouteCandidate>,
   },
+
+  // ✅ UPDATED — /profile now accessible by ALL logged-in users
   {
     path: "/profile",
-    element: <ProtectedRouteCandidate><MyProfile /></ProtectedRouteCandidate>,
+    element: <ProtectedRouteAny><MyProfile /></ProtectedRouteAny>,
   },
+
   {
     path: "/candidates/job/:id",
     element: <ProtectedRouteCandidate><JobDetailsPage /></ProtectedRouteCandidate>,
@@ -128,7 +141,7 @@ const router = createBrowserRouter([
     element: <ProtectedRouteHR><HrDetails /></ProtectedRouteHR>,
   },
 
-  // ✅ Employer Route — now uses ProtectedRouteEmployer
+  // Employer Route
   {
     path: "/compnay",
     element: <ProtectedRouteEmployer><CompnayDashbaord /></ProtectedRouteEmployer>,

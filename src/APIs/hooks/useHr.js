@@ -7,7 +7,8 @@ import {
     createDepartmentService,
     getDepartmentsService,
     getLanguagesService,
-    getRecruiterJobsService
+    getRecruiterJobsService,
+    publishJobService
 } from "../services/hrService";
 
 export default function useHr() {
@@ -181,16 +182,32 @@ export default function useHr() {
         }
     };
 
+    const publishJob = async (job_position_id, setJobsState) => {
+        try {
+            const data = await publishJobService(job_position_id);
+            toast.success(data.message || "Job published successfully!");
+            // Refresh jobs list after publish
+            if (typeof setJobsState === "function") {
+                fetchRecruiterJobs(setJobsState);
+            }
+            return true;
+        } catch (err) {
+            toast.error(err.message || "Failed to publish job!");
+            return false;
+        }
+    };
+
     return {
         createJob,
         registerHr,
         createDepartment,
         fetchDepartments,
         fetchLanguages,
-        fetchRecruiterJobs, 
+        fetchRecruiterJobs,
+        publishJob,
         departments,
         languages,
-        loading,            
+        loading,
         deptLoading,
         error,
         submitted,

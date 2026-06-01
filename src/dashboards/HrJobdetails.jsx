@@ -20,7 +20,7 @@ export default function HrJobdetails() {
   const location = useLocation();
 
   const [jobs, setJobs] = useState([]);
-  const [activeTab, setActiveTab] = useState('role'); 
+  const [activeTab, setActiveTab] = useState('role');
   const { fetchRecruiterJobs, loading } = useHr();
 
   const stateJob = location.state?.job;
@@ -84,7 +84,7 @@ export default function HrJobdetails() {
       <DashboardNavbar />
 
       <div className="w-full max-w-[96%] mx-auto px-2 sm:px-4 lg:px-6 py-6">
-        
+
         {/* Back Button */}
         <button
           onClick={() => navigate('/hrDashbaord')}
@@ -97,7 +97,7 @@ export default function HrJobdetails() {
         </button>
 
         <div className="flex flex-col gap-5 w-full">
-          
+
           {/* ── 1. HEADER CARD (Pure White Background) ── */}
           <div className="bg-white rounded-2xl p-6 border border-gray-100/80 shadow-xs">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -113,7 +113,7 @@ export default function HrJobdetails() {
                   <p className="text-[15px] text-gray-500 font-bold mt-0.5">{details.client_selection || 'Direct Placement'}</p>
                 </div>
               </div>
-              
+
               <div className="flex flex-wrap gap-2.5">
                 <span className="flex items-center gap-2 bg-gray-50 text-gray-700 text-[13px] font-bold px-4 py-2 rounded-xl border border-gray-100">
                   📍 {details.location || 'Not Specified'}
@@ -143,6 +143,8 @@ export default function HrJobdetails() {
                 <span className="block text-[#C1272D] font-bold text-[10px] uppercase tracking-wider">Gender Preference</span>
                 <span className="text-base font-black text-gray-800 block mt-0.5 capitalize">{details.gender || 'Open to All'}</span>
               </div>
+
+
               <div className="bg-stone-300/60 p-3.5 rounded-xl border border-gray-100/70 flex flex-col justify-center">
                 <span className="block text-[#C1272D] font-bold text-[10px] uppercase tracking-wider mb-1">Pipeline Visibility</span>
                 <div className="flex gap-2">
@@ -155,7 +157,14 @@ export default function HrJobdetails() {
                     </span>
                   )}
                 </div>
+                {/* ✅ Show applied candidates count only if published */}
+                {details.is_published && (
+                  <span className="mt-2 text-[12px] font-black text-gray-700">
+                    👤  {details.applied_candidates_count ?? 0} Applied
+                  </span>
+                )}
               </div>
+
             </div>
           </div>
 
@@ -164,18 +173,16 @@ export default function HrJobdetails() {
             <div className="flex border-b border-gray-100 bg-gray-50/70 p-2 gap-2">
               <button
                 onClick={() => setActiveTab('role')}
-                className={`px-6 py-3 text-sm font-extrabold rounded-xl transition-all duration-150 ${
-                  activeTab === 'role' ? 'bg-white text-[#C1272D] shadow-xs' : 'text-gray-500 hover:text-gray-800'
-                }`}
+                className={`px-6 py-3 text-sm font-extrabold rounded-xl transition-all duration-150 ${activeTab === 'role' ? 'bg-white text-[#C1272D] shadow-xs' : 'text-gray-500 hover:text-gray-800'
+                  }`}
               >
                 About The Role
               </button>
               {responsibilitiesList.length > 0 && (
                 <button
                   onClick={() => setActiveTab('responsibilities')}
-                  className={`px-6 py-3 text-sm font-extrabold rounded-xl transition-all duration-150 ${
-                    activeTab === 'responsibilities' ? 'bg-white text-[#C1272D] shadow-xs' : 'text-gray-500 hover:text-gray-800'
-                  }`}
+                  className={`px-6 py-3 text-sm font-extrabold rounded-xl transition-all duration-150 ${activeTab === 'responsibilities' ? 'bg-white text-[#C1272D] shadow-xs' : 'text-gray-500 hover:text-gray-800'
+                    }`}
                 >
                   Key Responsibilities ({responsibilitiesList.length})
                 </button>
@@ -183,9 +190,8 @@ export default function HrJobdetails() {
               {company.company_overview && (
                 <button
                   onClick={() => setActiveTab('company')}
-                  className={`px-6 py-3 text-sm font-extrabold rounded-xl transition-all duration-150 ${
-                    activeTab === 'company' ? 'bg-white text-[#C1272D] shadow-xs' : 'text-gray-500 hover:text-gray-800'
-                  }`}
+                  className={`px-6 py-3 text-sm font-extrabold rounded-xl transition-all duration-150 ${activeTab === 'company' ? 'bg-white text-[#C1272D] shadow-xs' : 'text-gray-500 hover:text-gray-800'
+                    }`}
                 >
                   Company Overview
                 </button>
@@ -256,7 +262,7 @@ export default function HrJobdetails() {
 
           {/* ── 4. REQUIREMENTS & SCREENING TWO-GRID (FONT SIZE & BG FIXED) ── */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 w-full">
-            
+
             {/* Left Box: Qualifications & Parameters */}
             <div className="bg-white rounded-2xl p-6 border border-gray-100/80 shadow-xs flex flex-col justify-between">
               <div>
@@ -305,14 +311,14 @@ export default function HrJobdetails() {
                   </p>
                 </div>
               </div>
-              
+
               {Array.isArray(screening.screening_questions) && screening.screening_questions.length > 0 && (
                 <div className="space-y-3">
                   <p className="text-[12px] font-black text-gray-400 uppercase tracking-wider">Evaluation Questionnaire</p>
                   <div className="space-y-2.5 max-h-44 overflow-y-auto pr-1">
                     {screening.screening_questions.map((q, i) => (
                       <div key={i} className="text-[14px] text-gray-700 bg-gray-50/60 p-3.5 rounded-xl border border-gray-100/80 font-medium flex items-start gap-2.5">
-                        <span className="font-black text-[#C1272D] text-base">Q{i+1}:</span>
+                        <span className="font-black text-[#C1272D] text-base">Q{i + 1}:</span>
                         <span className="leading-relaxed">{q}</span>
                       </div>
                     ))}
@@ -334,9 +340,8 @@ export default function HrJobdetails() {
               ].map((ch, i) => (
                 <div
                   key={i}
-                  className={`flex items-center gap-2.5 text-xs font-bold px-4 py-3 rounded-xl border transition-all ${
-                    ch.active ? 'bg-green-50 border-green-100 text-green-700' : 'bg-stone-300/60 border-gray-100 text-black'
-                  }`}
+                  className={`flex items-center gap-2.5 text-xs font-bold px-4 py-3 rounded-xl border transition-all ${ch.active ? 'bg-green-50 border-green-100 text-green-700' : 'bg-stone-300/60 border-gray-100 text-black'
+                    }`}
                 >
                   <span className={`w-2 h-2 rounded-full ${ch.active ? 'bg-green-500' : 'bg-gray-300'}`} />
                   {ch.label}

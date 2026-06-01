@@ -9,7 +9,8 @@ export default function HrDashboard() {
   const [jobs, setJobs] = useState([]);
   const navigate = useNavigate();
 
-  const { fetchRecruiterJobs, loading } = useHr();
+  // ✅ Added publishJob
+  const { fetchRecruiterJobs, publishJob, loading } = useHr();
 
   useEffect(() => {
     if (typeof fetchRecruiterJobs === 'function') {
@@ -22,14 +23,6 @@ export default function HrDashboard() {
     if (typeof fetchRecruiterJobs === 'function') {
       fetchRecruiterJobs(setJobs);
     }
-  };
-
-  const togglePublishJob = (id) => {
-    setJobs(prevJobs =>
-      prevJobs.map(job =>
-        job.id === id ? { ...job, isPublished: !job.isPublished } : job
-      )
-    );
   };
 
   const formatBudget = (budget) => {
@@ -52,7 +45,6 @@ export default function HrDashboard() {
     }
   };
 
-  // Pass full job object via router state — no re-fetch needed on details page
   const handleCardClick = (job) => {
     navigate(`/hrDashboard/job/${job.id}`, { state: { job } });
   };
@@ -173,12 +165,20 @@ export default function HrDashboard() {
                         <span className="text-gray-400 font-semibold text-[11px]">{formatDate(createdDate)}</span>
                       </div>
                       <div className="flex items-center gap-2 ml-auto sm:ml-0">
+
+                        {/* ✅ UPDATED - Real publish API call */}
                         <button
-                          onClick={(e) => { e.stopPropagation(); togglePublishJob(job.id); }}
-                          className={`px-3 py-1.5 rounded-lg font-bold text-xs transition-all active:scale-95 flex items-center gap-1 cursor-pointer border ${isItemPublished
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (!isItemPublished) {
+                              publishJob(job.id, setJobs);
+                            }
+                          }}
+                          className={`px-3 py-1.5 rounded-lg font-bold text-xs transition-all active:scale-95 flex items-center gap-1 border ${
+                            isItemPublished
                               ? "bg-green-50 text-green-600 border-green-200 shadow-none cursor-default active:scale-100"
-                              : "bg-[#C1272D] text-white border-transparent hover:bg-[#a61f24]"
-                            }`}
+                              : "bg-[#C1272D] text-white border-transparent hover:bg-[#a61f24] cursor-pointer"
+                          }`}
                         >
                           {isItemPublished && (
                             <svg className="w-3 h-3 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3.5}>
@@ -187,6 +187,7 @@ export default function HrDashboard() {
                           )}
                           {isItemPublished ? "Published" : "Publish Job"}
                         </button>
+
                         <div className="flex items-center bg-gray-50 border border-gray-100 rounded-lg p-0.5 text-gray-400">
                           <button
                             onClick={(e) => e.stopPropagation()}

@@ -25,6 +25,7 @@ export const URLS = {
     CREATE_DEPARTMENT: `${BASE_URL}/create_department`,
     GET_DEPARTMENTS: `${BASE_URL}/get_departments`,
     GET_LANGUAGES: `${BASE_URL}/get_languages`,
+    PUBLISH_JOB: `${BASE_URL}/publish_job_position`,
   },
   EMPLOYER: {
     VERIFY_GST: `${BASE_URL}/verify_gst`,
