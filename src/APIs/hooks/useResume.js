@@ -39,7 +39,7 @@ const useResume = () => {
   };
 
   const parseDate = (dateStr) => {
-    if (!dateStr) return { month: "", year: "" }; // Fixed backslash
+    if (!dateStr) return { month: "", year: "" };
     const months = {
       Jan: "01", Feb: "02", Mar: "03", Apr: "04", May: "05", Jun: "06",
       Jul: "07", Aug: "08", Sep: "09", Oct: "10", Nov: "11", Dec: "12"
@@ -98,8 +98,8 @@ const useResume = () => {
             company_name: exp.company,
             joining_date_from_month: from.month,
             joining_date_from_year: from.year,
-            joining_date_to_month: isCurrent ? "" : to.month, // Fixed backslash
-            joining_date_to_year: isCurrent ? "" : to.year,   // Fixed backslash
+            joining_date_to_month: isCurrent ? "" : to.month,
+            joining_date_to_year: isCurrent ? "" : to.year,
             current_employment: isCurrent ? "yes" : "no",
             skills_used: exp.skills,
           };
@@ -110,13 +110,8 @@ const useResume = () => {
 
       const data = await registerCandidateService(payload);
       toast.success("Candidate registered successfully!");
-
-      // TKN REMOVE: Clear token to bypass PublicRoute restriction
       localStorage.removeItem("token");
-
-      // Redirect to Login Page
       navigate("/login");
-
       return data;
     } catch (err) {
       setError(err.message);

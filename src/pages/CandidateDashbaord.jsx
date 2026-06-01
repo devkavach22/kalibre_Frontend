@@ -60,72 +60,80 @@ function formatPostedDate(dateStr) {
 
 function normalizeJob(job, index) {
   const color = LOGO_COLORS[index % LOGO_COLORS.length];
-  const companyName = String(job.client_selection_name || job.company || '').trim();
+  
+  const details = job.job_details || {};
+  const descriptionObj = job.job_description || {};
+  const preferences = job.candidate_preferences || {};
+  const company = job.company_details || {};
+  const screening = job.screening_questions || {};
 
-  const locationStr = Array.isArray(job.location_names) && job.location_names.length > 0
-    ? job.location_names.join(', ')
-    : (job.location || job.job_location || '');
+  const companyName = String(details.client_selection || details.company || '').trim();
 
-  const rawDeptStr = Array.isArray(job.department_names) && job.department_names.length > 0
-    ? job.department_names[0]
-    : (job.department || job.dept || '');
+  const locationStr = Array.isArray(details.location_names) && details.location_names.length > 0
+    ? details.location_names.join(', ')
+    : (details.location || details.job_location || 'Not Disclosed');
+
+  const rawDeptStr = Array.isArray(details.department_names) && details.department_names.length > 0
+    ? details.department_names[0]
+    : (details.department || details.dept || '');
     
   const deptStr = getStandardDepartment(rawDeptStr);
 
-  const allDepartments = Array.isArray(job.department_names) 
-    ? job.department_names.map(getStandardDepartment) 
+  const allDepartments = Array.isArray(details.department_names) 
+    ? details.department_names.map(getStandardDepartment) 
     : [deptStr].filter(Boolean);
 
   const allSkills = [
-    ...(Array.isArray(job.required_skill_names)  ? job.required_skill_names  : []),
-    ...(Array.isArray(job.preferred_skill_names) ? job.preferred_skill_names : []),
-  ];
+    ...(Array.isArray(preferences.required_skill_names) ? preferences.required_skill_names : []),
+    ...(Array.isArray(preferences.preferred_skill_names) ? preferences.preferred_skill_names : []),
+    ...(preferences.skills ? preferences.skills.split(',').map(s => s.trim()) : [])
+  ].filter(Boolean);
 
-  const cleanDesc = stripHtml(job.description || job.about_the_role || '');
+  const cleanDesc = stripHtml(descriptionObj.about_the_role || details.description || '');
 
   return {
     id:             job.id || index + 1,
-    title:          job.name || job.title || 'Untitled',
+    title:          details.name || details.title || 'Untitled',
     company:        companyName,
     logoLetter:     (companyName?.[0] || 'J').toUpperCase(),
     logoColor:      color.bg,
     logoTextColor:  color.text,
-    rating:         job.rating  || 0,
-    reviews:        job.reviews || 0,
-    experience:     formatExperience(job.experience_from, job.experience_to),
-    salary:         formatSalary(job.budget_from, job.budget_to),
+    rating:         job.rating  || details.rating || 0,
+    reviews:        job.reviews || details.reviews || 0,
+    experience:     formatExperience(details.experience_from, details.experience_to),
+    salary:         formatSalary(details.budget_from, details.budget_to),
     location:       locationStr,
     description:    cleanDesc,
     tags:           allDepartments,
-    jobType:        job.job_type  || job.jobType  || 'Full Time',
-    postedAgo:      formatPostedDate(job.published_date || job.posted_date),
-    workMode:       job.work_mode || job.workMode || 'Work From Office',
+    jobType:        details.job_type  || details.jobType  || 'Full Time',
+    postedAgo:      formatPostedDate(details.create_date || details.published_date || details.posted_date),
+    workMode:       details.work_mode || details.workMode || 'Work From Office',
     dept:           deptStr,
-    salaryRange:    getSalaryRangeLabel(job.budget_from, job.budget_to),
-    companyType:    job.company_type  || job.companyType || 'Corporate',
-    role:           job.role_category || job.role || '',
-    qualification:  job.qualification_name  || '',
-    specialization: job.specialization_name || '',
-    openings:         job.number_of_openings || job.no_of_recruitment || 0,
-    highlights:       job.key_responsibilities
-                        ? job.key_responsibilities.split('\n').filter(Boolean)
+    salaryRange:    getSalaryRangeLabel(details.budget_from, details.budget_to),
+    companyType:    details.company_type  || details.companyType || 'Corporate',
+    role:           details.role_category || details.role || '',
+    qualification:  preferences.required_qualifications  || '',
+    specialization: details.specialization_name || '',
+    openings:         details.number_of_openings || details.no_of_recruitment || 0,
+    highlights:       descriptionObj.key_responsibilities
+                        ? descriptionObj.key_responsibilities.split('\n').filter(Boolean)
                         : [],
     matchScore:       [],
     keySkills:        allSkills,
-    about:            job.company_overview || '',
+    about:            company.company_overview || '',
     companyTags:      [
-                        ...(Array.isArray(job.industry_names) ? job.industry_names : []),
-                        ...(Array.isArray(job.department_names) ? job.department_names : []),
+                        ...(Array.isArray(details.industry_names) ? details.industry_names : []),
+                        ...(Array.isArray(details.department_names) ? details.department_names : []),
                       ].slice(0, 3),
-    screeningQuestions: Array.isArray(job.screening_questions) ? job.screening_questions : [],
-    aboutTheRole:     job.about_the_role || '',
-    requiredQualifications: job.required_qualifications || '',
-    certifications:   job.certifications || '',
-    perks:            job.perks || {},
-    gender:           job.gender || '',
-    ageLimit:         job.age_limit || 0,
-    levelName:        job.level_name || '',
-    reportingTo:      job.reporting_to || '',
+    screeningQuestions: Array.isArray(screening.screening_questions) ? screening.screening_questions : [],
+    aboutTheRole:     descriptionObj.about_the_role || '',
+    requiredQualifications: preferences.required_qualifications || '',
+    certifications:   preferences.certifications || '',
+    perks:            job.perks || details.perks || {},
+    gender:           details.gender || '',
+    ageLimit:         details.age_limit || 0,
+    levelName:        details.level_name || '',
+    reportingTo:      details.reporting_to || '',
   };
 }
 
@@ -210,7 +218,6 @@ function JobCard({ job }) {
 }
 
 function CandidateDashboard() {
-  const [activeTab, setActiveTab]         = useState('profile');
   const [keyword, setKeyword]             = useState('');
   const [experience, setExperience]       = useState('');
   const [locationInput, setLocationInput] = useState('');
@@ -347,11 +354,8 @@ function CandidateDashboard() {
     liveCounts,
   };
 
-  const profileJobs    = filteredJobs.filter((_, i) => i < Math.ceil(filteredJobs.length / 2));
-  const preferenceJobs = filteredJobs.filter((_, i) => i >= Math.ceil(filteredJobs.length / 2));
-  const activeJobs     = activeTab === 'profile' ? profileJobs : preferenceJobs;
-  const firstThree     = activeJobs.slice(0, 3);
-  const rest           = activeJobs.slice(3);
+  const firstThree     = filteredJobs.slice(0, 3);
+  const rest           = filteredJobs.slice(3);
 
   const expOptions = [
     { value: '', label: 'Select Experience' },
@@ -461,24 +465,6 @@ function CandidateDashboard() {
       <div className="px-4 sm:px-6 lg:px-10 py-5 flex gap-5 items-start">
         <main className="flex-1 min-w-0 flex flex-col gap-4">
 
-          <div className="flex items-center justify-evenly bg-white rounded-full p-2 w-full max-w-xs sm:max-w-sm mx-auto lg:mx-0 lg:self-start shadow-sm border border-gray-100">
-            {['profile', 'preferences'].map((tab) => {
-              const count = tab === 'profile' ? profileJobs.length : preferenceJobs.length;
-              return (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className="flex-1 lg:flex-none px-3 sm:px-4 py-2 rounded-full text-xs font-semibold capitalize transition-all duration-200 text-center"
-                  style={activeTab === tab
-                    ? { background: 'linear-gradient(92.62deg,#FA2329 0.91%,#B10D1C 99.09%)', color: '#fff' }
-                    : { background: '#FFE3E4', color: '#C8102E' }}
-                >
-                  {tab === 'profile' ? `Profile (${count})` : `Preferences (${count})`}
-                </button>
-              );
-            })}
-          </div>
-
           {jobsLoading && (
             <div className="flex items-center justify-center py-20">
               <div className="flex flex-col items-center gap-3">
@@ -511,7 +497,7 @@ function CandidateDashboard() {
                 </div>
               )}
 
-              {showRelevance && activeJobs.length > 0 && (
+              {showRelevance && filteredJobs.length > 0 && (
                 <div className="rounded-xl px-4 py-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3" style={{ background: 'linear-gradient(135deg,#FFF0F0 0%,#FFE4E4 100%)', border: '1px solid #fecdd3' }}>
                   <p className="text-xs font-semibold text-[#111111]">Are These <span className="text-[#C8102E]">Jobs</span> Relevant For You?</p>
                   <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
@@ -527,7 +513,7 @@ function CandidateDashboard() {
                 </div>
               )}
 
-              {activeJobs.length === 0 && (
+              {filteredJobs.length === 0 && (
                 <div className="flex flex-col items-center justify-center py-16 text-center">
                   <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center mb-3">
                     <svg className="w-6 h-6 text-[#C8102E]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
