@@ -6,6 +6,8 @@ import {
   loginUser,
   forgotPasswordService,
   resetPasswordService,
+  verifyGstService,
+  employerRegisterService,
 } from "../services/authService";
 
 const useAuth = () => {
@@ -29,6 +31,50 @@ const useAuth = () => {
     } catch (err) {
       setError(err.message);
       toast.error(err.message || "Registration failed!");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const verifyGst = async (gst_number) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await verifyGstService(gst_number);
+      if (data.status === "success") {
+        toast.success("GST verified successfully!");
+        return data.data;
+      }
+    } catch (err) {
+      setError(err.message);
+      toast.error(err.message || "GST verification failed!");
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const employerRegister = async (formData) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const payload = {
+        company_name: formData.companyName,
+        gst_number: formData.gstNumber,
+        pan_number: formData.panNumber,
+        city: formData.city,
+        state: formData.state,
+        address: formData.address,
+        email: formData.workEmail,
+        password: formData.password,
+        role: "employer",
+      };
+      await employerRegisterService(payload);
+      toast.success("Employer registered successfully!");
+      navigate("/login");
+    } catch (err) {
+      setError(err.message);
+      toast.error(err.message || "Employer registration failed!");
     } finally {
       setLoading(false);
     }
@@ -61,9 +107,12 @@ const useAuth = () => {
 
         toast.success("Logged in successfully!");
 
-
-        const isRecruiterDone = data.recruiter_registration_done === true || data.recruiter_registration_done === "true";
-        const isCandidateDone = data.candidate_registration_done === true || data.candidate_registration_done === "true";
+        const isRecruiterDone =
+          data.recruiter_registration_done === true ||
+          data.recruiter_registration_done === "true";
+        const isCandidateDone =
+          data.candidate_registration_done === true ||
+          data.candidate_registration_done === "true";
 
         if (data.user_type === "recruiter") {
           if (isRecruiterDone) {
@@ -71,9 +120,10 @@ const useAuth = () => {
           } else {
             navigate("/hr");
           }
+        } else if (data.user_type === "employer") {
+          navigate("/compnay");  // ✅ employer route added
         } else if (data.user_type === "candidate") {
           if (isCandidateDone) {
-            // Agar bada form ho chuka hai
             navigate("/candidates");
           } else {
             navigate("/resume/upload");
@@ -106,11 +156,21 @@ const useAuth = () => {
     }
   };
 
-  const resetPassword = async ({ email, otp, new_password, confirm_password }) => {
+  const resetPassword = async ({
+    email,
+    otp,
+    new_password,
+    confirm_password,
+  }) => {
     setLoading(true);
     setError(null);
     try {
-      const data = await resetPasswordService({ email, otp, new_password, confirm_password });
+      const data = await resetPasswordService({
+        email,
+        otp,
+        new_password,
+        confirm_password,
+      });
       toast.success(data.message || "Password reset successfully!");
       navigate("/login");
       return true;
@@ -123,7 +183,16 @@ const useAuth = () => {
     }
   };
 
-  return { register, login, forgotPassword, resetPassword, loading, error };
+  return {
+    register,
+    login,
+    forgotPassword,
+    resetPassword,
+    verifyGst,
+    employerRegister,
+    loading,
+    error,
+  };
 };
 
 export default useAuth;

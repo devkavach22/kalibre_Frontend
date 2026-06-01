@@ -48,3 +48,25 @@ export const resetPasswordService = async (payload) => {
   if (!response.ok) throw new Error(data.message || "Failed to reset password");
   return data;
 };
+
+export const verifyGstService = async (gst_number) => {
+  const response = await fetch(URLS.EMPLOYER.VERIFY_GST, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ gst_number }),
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || "GST verification failed");
+  return data;
+};
+
+export const employerRegisterService = async (payload) => {
+  const response = await fetch(URLS.EMPLOYER.REGISTER, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || "Employer registration failed");
+  return data;
+};

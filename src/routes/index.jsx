@@ -18,19 +18,18 @@ import ForgetPassword from "../auth/ForgetPassword";
 import ResumeUpload from "../pages/ResumeUpload";
 import CandidateDashbaord from "../pages/CandidateDashbaord";
 import JobDetailsPage from "../dashboards/JobDetailsPage";
-
-import HrRegister from "../dashboards/HrRegister"
+import HrRegister from "../dashboards/HrRegister";
 import HrDashboard from "../dashboards/HrDashboard";
-import MyProfile from "../dashboards/UserProfile"
-import HrDetails from "../dashboards/HrJobdetails"
+import MyProfile from "../dashboards/UserProfile";
+import HrDetails from "../dashboards/HrJobdetails";
+import CompnayDashbaord from "../Company/CompnayDashbaord";
 
+// ───── Route Guards ─────
 
-// eslint-disable-next-line react-refresh/only-export-components
 const PublicRoute = ({ children }) => {
   const token = localStorage.getItem("token");
   return token ? <Navigate to="/" replace /> : children;
 };
-
 
 const ProtectedRouteHR = ({ children }) => {
   const token = localStorage.getItem("token");
@@ -38,10 +37,9 @@ const ProtectedRouteHR = ({ children }) => {
   const isHR = userType?.toLowerCase() === "hr" || userType?.toLowerCase() === "recruiter";
 
   if (!token) return <Navigate to="/login" replace />;
-  if (!isHR) return <Navigate to="/" replace />; 
+  if (!isHR) return <Navigate to="/" replace />;
   return children;
 };
-
 
 const ProtectedRouteCandidate = ({ children }) => {
   const token = localStorage.getItem("token");
@@ -49,14 +47,27 @@ const ProtectedRouteCandidate = ({ children }) => {
   const isHR = userType?.toLowerCase() === "hr" || userType?.toLowerCase() === "recruiter";
 
   if (!token) return <Navigate to="/login" replace />;
-  if (isHR) return <Navigate to="/" replace />; 
+  if (isHR) return <Navigate to="/" replace />;
   return children;
 };
+
+// ✅ NEW - Employer Route Guard
+const ProtectedRouteEmployer = ({ children }) => {
+  const token = localStorage.getItem("token");
+  const userType = localStorage.getItem("user_type");
+  const isEmployer = userType?.toLowerCase() === "employer";
+
+  if (!token) return <Navigate to="/login" replace />;
+  if (!isEmployer) return <Navigate to="/" replace />;
+  return children;
+};
+
+// ───── Routes ─────
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />, 
+    element: <App />,
     children: [
       { index: true, element: <LandingPage /> },
       { path: "/about", element: <AboutUs /> },
@@ -104,17 +115,24 @@ const router = createBrowserRouter([
   },
   {
     path: "/hr",
-    element: <PublicRoute><HrRegister /></PublicRoute>, 
+    element: <PublicRoute><HrRegister /></PublicRoute>,
   },
 
+  // HR/Recruiter Routes
   {
     path: "/hrDashbaord",
     element: <ProtectedRouteHR><HrDashboard /></ProtectedRouteHR>,
   },
- {
+  {
     path: "/hrDashboard/job/:id",
     element: <ProtectedRouteHR><HrDetails /></ProtectedRouteHR>,
-  }
+  },
+
+  // ✅ Employer Route — now uses ProtectedRouteEmployer
+  {
+    path: "/compnay",
+    element: <ProtectedRouteEmployer><CompnayDashbaord /></ProtectedRouteEmployer>,
+  },
 ]);
 
 export default router;

@@ -15,7 +15,7 @@ export const URLS = {
   },
   JOBS: {
     GET_PUBLISHED: `${BASE_URL}/get_published_jobs`,
-    GET_RECRUITER_JOBS: `${BASE_URL}/get_recruiter_jobs`, 
+    GET_RECRUITER_JOBS: `${BASE_URL}/get_recruiter_jobs`,
   },
   RECRUITMENT: {
     REGISTER: `${BASE_URL}/recruitment/register`,
@@ -25,5 +25,9 @@ export const URLS = {
     CREATE_DEPARTMENT: `${BASE_URL}/create_department`,
     GET_DEPARTMENTS: `${BASE_URL}/get_departments`,
     GET_LANGUAGES: `${BASE_URL}/get_languages`,
+  },
+  EMPLOYER: {
+    VERIFY_GST: `${BASE_URL}/verify_gst`,
+    REGISTER: `${BASE_URL}/employer/register`,
   },
 };

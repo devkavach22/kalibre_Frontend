@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
+import toast from "react-hot-toast"
 import AuthPick from "../assets/authpic.png"
 import Logo from "../assets/Logo.png"
 import useAuth from "../APIs/hooks/useAuth"
@@ -7,7 +8,7 @@ import useAuth from "../APIs/hooks/useAuth"
 const ROLES = ['candidate', 'employer', 'recruiter'];
 
 function Register() {
-  const { register, loading, error } = useAuth();
+  const { register, verifyGst, employerRegister, loading, error } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [agreed, setAgreed] = useState(false);
   const [gstVerified, setGstVerified] = useState(false);
@@ -36,35 +37,36 @@ function Register() {
     setGstVerified(false);
   };
 
-  const handleGstVerify = () => {
-    if (!formData.gstNumber) return;
-    setGstLoading(true);
-    setTimeout(() => {
-      setGstLoading(false);
-      setGstVerified(true);
-      setFormData((prev) => ({
-        ...prev,
-        companyName: 'Acme Corp Pvt Ltd',
-        state: 'Maharashtra',
-      }));
-    }, 1500);
-  };
+  const handleGstVerify = async () => {
+  if (!formData.gstNumber) return;
+  setGstLoading(true);
+  const gstData = await verifyGst(formData.gstNumber);
+  if (gstData) {
+    setGstVerified(true);
+    const city    = gstData.city || "";
+    const state   = gstData.state || "";
+    const country = gstData.raw_data?.country_id?.display_name || "";
+    setFormData((prev) => ({
+      ...prev,
+      companyName: gstData.company_name || "",
+      city,
+      state,
+      address: [city, state, country].filter(Boolean).join(", "),
+      panNumber: gstData.pan_number || "",
+    }));
+  }
+  setGstLoading(false);
+};
 
   const handleSubmit = () => {
-    if (!agreed) return;
-    if (formData.role === 'employer') {
-      register({
-        role: formData.role,
-        gstNumber: formData.gstNumber,
-        companyName: formData.companyName,
-        panNumber: formData.panNumber,
-        city: formData.city,
-        state: formData.state,
-        address: formData.address,
-        email: formData.workEmail,
-        password: formData.password,
-      });
+    if (isEmployer) {
+      if (!gstVerified) {
+        toast.error("Please verify GST number first!");
+        return;
+      }
+      employerRegister(formData);
     } else {
+      if (!agreed) return;
       register({
         name: formData.name,
         email: formData.email,
@@ -89,7 +91,7 @@ function Register() {
           boxShadow: '0 8px 40px rgba(0,0,0,0.07)',
         }}
       >
-        {/* Left - Form — always 50% */}
+        {/* Left - Form */}
         <div className="w-full lg:w-1/2 flex flex-col px-6 sm:px-10 md:px-12 py-8 sm:py-10 md:py-12 bg-white">
           {!isEmployer && (
             <div className="mb-6 sm:mb-8">
@@ -109,7 +111,7 @@ function Register() {
             </>
           )}
 
-          {/* Role Selector — only shown for candidate / recruiter */}
+          {/* Role Selector */}
           {!isEmployer && (
             <div className="flex items-center gap-2 mb-6 sm:mb-8">
               {ROLES.map((role) => {
@@ -155,7 +157,7 @@ function Register() {
                   <span className="text-[#333333] font-semibold text-sm">Verification</span>
                 </div>
 
-                {/* GST Number - Stack on mobile */}
+                {/* GST Number */}
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[#111111] text-sm font-medium">GST Number <span className="text-red-500">*</span></label>
                   <div className="flex flex-col sm:flex-row gap-2">
@@ -165,12 +167,15 @@ function Register() {
                       value={formData.gstNumber}
                       onChange={handleChange}
                       placeholder="Enter GST Number"
-                      className="w-full sm:flex-1 px-4 py-3 rounded-lg border border-gray-300 text-sm text-[#444444] placeholder-gray-400 outline-none focus:border-[#C8102E] transition-colors duration-200 bg-white"
+                      readOnly={gstVerified}
+                      className={`w-full sm:flex-1 px-4 py-3 rounded-lg border text-sm text-[#444444] placeholder-gray-400 outline-none transition-colors duration-200 ${
+                        gstVerified ? 'bg-gray-100 border-gray-200 cursor-not-allowed' : 'bg-white border-gray-300 focus:border-[#C8102E]'
+                      }`}
                     />
                     <button
                       type="button"
                       onClick={handleGstVerify}
-                      disabled={gstLoading || !formData.gstNumber}
+                      disabled={gstLoading || !formData.gstNumber || gstVerified}
                       className="w-full sm:w-auto px-5 py-3 rounded-lg text-white text-sm font-semibold transition-all duration-200 hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
                       style={{ background: 'linear-gradient(92.62deg, #FA2329 0.91%, #B10D1C 99.09%)' }}
                     >
@@ -189,7 +194,10 @@ function Register() {
                       value={formData.companyName}
                       onChange={handleChange}
                       placeholder="Auto-Filled From GST"
-                      className="w-full px-4 py-3 rounded-lg border border-gray-300 text-sm text-[#444444] placeholder-gray-400 outline-none focus:border-[#C8102E] transition-colors duration-200 bg-white"
+                      readOnly={gstVerified}
+                      className={`w-full px-4 py-3 rounded-lg border text-sm text-[#444444] placeholder-gray-400 outline-none transition-colors duration-200 ${
+                        gstVerified ? 'bg-gray-100 border-gray-200 cursor-not-allowed' : 'bg-white border-gray-300 focus:border-[#C8102E]'
+                      }`}
                     />
                   </div>
                   <div className="flex flex-col gap-1.5 flex-1">
@@ -200,7 +208,10 @@ function Register() {
                       value={formData.panNumber}
                       onChange={handleChange}
                       placeholder="Enter PAN Number"
-                      className="w-full px-4 py-3 rounded-lg border border-gray-300 text-sm text-[#444444] placeholder-gray-400 outline-none focus:border-[#C8102E] transition-colors duration-200 bg-white"
+                      readOnly={gstVerified}
+                      className={`w-full px-4 py-3 rounded-lg border text-sm text-[#444444] placeholder-gray-400 outline-none transition-colors duration-200 ${
+                        gstVerified ? 'bg-gray-100 border-gray-200 cursor-not-allowed' : 'bg-white border-gray-300 focus:border-[#C8102E]'
+                      }`}
                     />
                   </div>
                 </div>
@@ -215,7 +226,10 @@ function Register() {
                       value={formData.city}
                       onChange={handleChange}
                       placeholder="Enter City"
-                      className="w-full px-4 py-3 rounded-lg border border-gray-300 text-sm text-[#444444] placeholder-gray-400 outline-none focus:border-[#C8102E] transition-colors duration-200 bg-white"
+                      readOnly={gstVerified}
+                      className={`w-full px-4 py-3 rounded-lg border text-sm text-[#444444] placeholder-gray-400 outline-none transition-colors duration-200 ${
+                        gstVerified ? 'bg-gray-100 border-gray-200 cursor-not-allowed' : 'bg-white border-gray-300 focus:border-[#C8102E]'
+                      }`}
                     />
                   </div>
                   <div className="flex flex-col gap-1.5 flex-1">
@@ -226,12 +240,15 @@ function Register() {
                       value={formData.state}
                       onChange={handleChange}
                       placeholder="State"
-                      className="w-full px-4 py-3 rounded-lg border border-gray-300 text-sm text-[#444444] placeholder-gray-400 outline-none focus:border-[#C8102E] transition-colors duration-200 bg-white"
+                      readOnly={gstVerified}
+                      className={`w-full px-4 py-3 rounded-lg border text-sm text-[#444444] placeholder-gray-400 outline-none transition-colors duration-200 ${
+                        gstVerified ? 'bg-gray-100 border-gray-200 cursor-not-allowed' : 'bg-white border-gray-300 focus:border-[#C8102E]'
+                      }`}
                     />
                   </div>
                 </div>
 
-                {/* Address */}
+                {/* Address — auto-filled, still editable */}
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[#111111] text-sm font-medium">Address <span className="text-red-500">*</span></label>
                   <textarea
@@ -244,7 +261,7 @@ function Register() {
                   />
                 </div>
 
-                {/* Work Email + Password — single row */}
+                {/* Work Email + Password */}
                 <div className="flex flex-col sm:flex-row gap-3">
                   <div className="flex flex-col gap-1.5 flex-1">
                     <label className="text-[#111111] text-sm font-medium">Work Email <span className="text-red-500">*</span></label>
@@ -291,7 +308,7 @@ function Register() {
                 {/* Error */}
                 {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
-                {/* Cancel + Submit - Stack on mobile */}
+                {/* Cancel + Submit */}
                 <div className="flex flex-col sm:flex-row gap-3 mt-6 sm:mt-8">
                   <Link
                     to="/"
@@ -408,7 +425,7 @@ function Register() {
           </div>
         </div>
 
-        {/* Right - Illustration — always 50% */}
+        {/* Right - Illustration */}
         <div
           className="hidden lg:flex w-1/2 flex-col items-center justify-center px-12 py-12 text-center gap-6"
           style={{ background: 'linear-gradient(151.25deg, #ffffff 0.64%, #FFE3E4 99.36%)' }}
