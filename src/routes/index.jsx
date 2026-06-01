@@ -22,6 +22,7 @@ import JobDetailsPage from "../dashboards/JobDetailsPage";
 import HrRegister from "../dashboards/HrRegister"
 import HrDashboard from "../dashboards/HrDashboard";
 import MyProfile from "../dashboards/UserProfile"
+import HrDetails from "../dashboards/HrJobdetails"
 
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -110,6 +111,10 @@ const router = createBrowserRouter([
     path: "/hrDashbaord",
     element: <ProtectedRouteHR><HrDashboard /></ProtectedRouteHR>,
   },
+ {
+    path: "/hrDashboard/job/:id",
+    element: <ProtectedRouteHR><HrDetails /></ProtectedRouteHR>,
+  }
 ]);
 
 export default router;

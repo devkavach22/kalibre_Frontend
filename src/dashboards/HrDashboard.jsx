@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DashboardNavbar from '../dashboards/DashboardNavbar';
 import AddJobModal, { CompanyAvatar } from './AddJobModal'; 
 import useHr from '../APIs/hooks/useHr'; 
@@ -6,11 +7,10 @@ import useHr from '../APIs/hooks/useHr';
 export default function HrDashboard() {
   const [showModal, setShowModal] = useState(false);
   const [jobs, setJobs] = useState([]);
+  const navigate = useNavigate();
 
-  // Hook connectivity for fetching jobs layout data
   const { fetchRecruiterJobs, loading } = useHr();
 
-  // Load backend active lists instantly
   useEffect(() => {
     if (typeof fetchRecruiterJobs === 'function') {
       fetchRecruiterJobs(setJobs);
@@ -32,19 +32,16 @@ export default function HrDashboard() {
     );
   };
 
-  // Helper function to format Budget from decimal numbers safely (e.g. 400000 -> 4 Lakhs)
   const formatBudget = (budget) => {
     if (!budget) return "Not Disclosed";
     return `${budget / 100000} Lakhs`;
   };
 
-  // Helper function to convert "2026-05-29 12:37:34" to "29 May 2026"
   const formatDate = (dateString) => {
     if (!dateString) return "Recent";
     try {
-      const date = new Date(dateString.replace(' ', 'T')); // Formatting string for standard JS Date object
+      const date = new Date(dateString.replace(' ', 'T'));
       if (isNaN(date.getTime())) return "Recent";
-      
       return date.toLocaleDateString('en-GB', {
         day: 'numeric',
         month: 'short',
@@ -55,6 +52,11 @@ export default function HrDashboard() {
     }
   };
 
+  // Pass full job object via router state — no re-fetch needed on details page
+  const handleCardClick = (job) => {
+    navigate(`/hrDashboard/job/${job.id}`, { state: { job } });
+  };
+
   return (
     <div className="min-h-screen pb-12" style={{ background: 'linear-gradient(180deg, #FFEFEF 0%, #FFFFFF 100%)' }}>
       <DashboardNavbar />
@@ -62,7 +64,7 @@ export default function HrDashboard() {
 
       <div className="w-full px-4 sm:px-6 lg:px-8 pt-8">
         
-        {/* HERO HEADER SECTION PRESERVED UNTOUCHED */}
+        {/* HERO HEADER SECTION */}
         <div className="flex flex-col sm:flex-row items-center justify-between pb-6 mb-6 gap-4">
           <div className="flex-1 text-center">
             <h1 className="text-2xl sm:text-4xl font-bold text-[#C1272D] tracking-tight">Post & Manage Jobs</h1>
@@ -77,7 +79,6 @@ export default function HrDashboard() {
           </button>
         </div>
 
-        {/* COMPONENT CONTENT LIFECYCLE CONTROLS */}
         {loading ? (
           <div className="flex justify-center items-center py-20">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#C1272D]"></div>
@@ -87,7 +88,6 @@ export default function HrDashboard() {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {jobs && jobs.map((job, index) => {
                 
-                // DATA DESTRUCTURING FROM REAL API KEY PAIRS
                 const details = job?.job_details || {};
                 const company = job?.company_details || {};
                 const preferences = job?.candidate_preferences || {};
@@ -98,30 +98,26 @@ export default function HrDashboard() {
                 const displayCompany = details?.client_selection || "Company Name";
                 const displayLocation = details?.location || "Not Specified";
                 const displayDesc = description?.about_the_role || "No description provided.";
-                const createdDate = details?.create_date || ""; // Real create_date bound cleanly
+                const createdDate = details?.create_date || "";
                 
-                // Dynamic skills string parser array conversion
                 const displaySkills = preferences?.skills 
                   ? preferences.skills.split(',').map(s => s.trim()) 
                   : [];
 
-                // Decimal scale experiences tracker conversion 
                 const expFrom = details?.experience_from ? Math.floor(details.experience_from) : 0;
                 const expTo = details?.experience_to ? Math.floor(details.experience_to) : 0;
                 const experienceRange = `${expFrom} - ${expTo} Years`;
 
-                // Budget arrays configurations
                 const salaryRange = details?.budget_from 
                   ? `${formatBudget(details.budget_from)} - ${formatBudget(details.budget_to)}`
                   : "Not Disclosed";
 
                 return (
                   <div key={job.id || index}
-                    className="bg-white border border-gray-200 rounded-2xl p-5 sm:p-6 shadow-xs transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lg hover:border-red-100 flex flex-col justify-between group">
+                    onClick={() => handleCardClick(job)}
+                    className="bg-white border border-gray-200 rounded-2xl p-5 sm:p-6 shadow-xs transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lg hover:border-red-100 flex flex-col justify-between group cursor-pointer">
                     <div>
                       <div className="flex items-start gap-4">
-                        
-                        {/* Dynamic company logo processing */}
                         {company?.company_logo ? (
                           <img 
                             src={company.company_logo.startsWith('data:') ? company.company_logo : `data:image/png;base64,${company.company_logo}`} 
@@ -137,13 +133,11 @@ export default function HrDashboard() {
                             {displayTitle}
                           </h3>
                           <div className="flex items-center gap-2 mt-1.5">
-                            {/* Pure layout configuration without static ratings & reviews fields */}
                             <span className="text-sm font-semibold text-gray-500 truncate">{displayCompany}</span>
                           </div>
                         </div>
                       </div>
 
-                      {/* STRUCTURAL ICON GRID SECTION */}
                       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-1 py-3.5 my-4 border-y border-gray-100 text-[13px] font-semibold text-gray-600">
                         <div className="flex items-center gap-1.5 min-w-0 w-full sm:w-auto">
                           <svg className="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
@@ -159,10 +153,8 @@ export default function HrDashboard() {
                         </div>
                       </div>
 
-                      {/* TEXT CONTEXT PARAGRAPHS */}
                       <p className="text-sm text-gray-400 leading-relaxed font-normal line-clamp-3">{displayDesc}</p>
                       
-                      {/* MAP LOOP RUNNING ON SPLIT SKILLS */}
                       <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 mt-4.5">
                         {displaySkills.map((skill, idx) => (
                           <div key={idx} className="flex items-center gap-1 text-gray-500 text-xs font-semibold">
@@ -173,18 +165,16 @@ export default function HrDashboard() {
                       </div>
                     </div>
 
-                    {/* REFACTOR ACTION AND SPEC METADATA SECTION BAR */}
                     <div className="mt-6 pt-4 border-t border-gray-100 flex flex-wrap items-center justify-between gap-y-3 text-xs">
                       <div className="flex items-center gap-2">
                         <span className="border border-red-200 text-[#C1272D] bg-red-50/40 px-2.5 py-0.5 rounded-full font-bold text-[10px] tracking-wider uppercase">
                           {details?.department_names?.[0] || "General"}
                         </span>
-                        {/* Dynamic evaluated date binding matching layout standard */}
                         <span className="text-gray-400 font-semibold text-[11px]">{formatDate(createdDate)}</span>
                       </div>
                       <div className="flex items-center gap-2 ml-auto sm:ml-0">
                         <button
-                          onClick={() => togglePublishJob(job.id)}
+                          onClick={(e) => { e.stopPropagation(); togglePublishJob(job.id); }}
                           className={`px-3 py-1.5 rounded-lg font-bold text-xs transition-all active:scale-95 flex items-center gap-1 cursor-pointer border ${isItemPublished
                               ? "bg-green-50 text-green-600 border-green-200 shadow-none cursor-default active:scale-100"
                               : "bg-[#C1272D] text-white border-transparent hover:bg-[#a61f24]"
@@ -198,7 +188,9 @@ export default function HrDashboard() {
                           {isItemPublished ? "Published" : "Publish Job"}
                         </button>
                         <div className="flex items-center bg-gray-50 border border-gray-100 rounded-lg p-0.5 text-gray-400">
-                          <button className="hover:text-red-500 transition-colors p-1.5 cursor-pointer rounded-md hover:bg-white" title="Bookmark Job">
+                          <button
+                            onClick={(e) => e.stopPropagation()}
+                            className="hover:text-red-500 transition-colors p-1.5 cursor-pointer rounded-md hover:bg-white" title="Bookmark Job">
                             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
                           </button>
                         </div>

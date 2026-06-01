@@ -7,7 +7,7 @@ import {
     createDepartmentService,
     getDepartmentsService,
     getLanguagesService,
-    getRecruiterJobsService // Import naya service function
+    getRecruiterJobsService
 } from "../services/hrService";
 
 export default function useHr() {
@@ -20,7 +20,6 @@ export default function useHr() {
     const [departments, setDepartments] = useState([]);
     const [languages, setLanguages] = useState([]);
 
-    // API se Recruiter Jobs fetch karne ka sorted function
     const fetchRecruiterJobs = async (setJobsState) => {
         setLoading(true);
         setError(null);
@@ -188,10 +187,10 @@ export default function useHr() {
         createDepartment,
         fetchDepartments,
         fetchLanguages,
-        fetchRecruiterJobs, // Exposed to UI
+        fetchRecruiterJobs, 
         departments,
         languages,
-        loading,             // Exposed to UI
+        loading,            
         deptLoading,
         error,
         submitted,
