@@ -17,6 +17,7 @@ function Login() {
     { id: 'candidate', label: 'Candidate' },
     { id: 'employer', label: 'Employer' },
     { id: 'recruiter', label: 'Recruiter' },
+    { id: 'admin', label: 'Admin' },
   ];
 
   const handleChange = (e) => {
@@ -24,7 +25,6 @@ function Login() {
   };
 
   const handleSubmit = () => {
-    // Yahan activeTab ko role ke roop me send kiya gaya hai
     login({ email: formData.email, password: formData.password, role: activeTab });
   };
 
@@ -83,7 +83,7 @@ function Login() {
           <h2 className="text-[#111111] font-bold text-2xl sm:text-3xl mb-1">Welcome Back</h2>
           <p className="text-[#666666] text-sm mb-6 sm:mb-8">Sign In To Your Account To Continue</p>
 
-          {/* Tabs - Removed pink background for desktop wrapper */}
+          {/* Tabs */}
           <div className="flex flex-col sm:flex-row mb-6 sm:mb-8 bg-transparent sm:bg-transparent p-0 sm:p-1 rounded-2xl sm:rounded-full w-full gap-2 sm:gap-0 sm:border-0">
             {tabs.map((tab) => (
               <button

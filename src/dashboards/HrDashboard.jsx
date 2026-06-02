@@ -112,7 +112,8 @@ export default function HrDashboard() {
                       <div className="flex items-start gap-4">
                         {company?.company_logo ? (
                           <img 
-                            src={company.company_logo.startsWith('data:') ? company.company_logo : `data:image/png;base64,${company.company_logo}`} 
+                            src={`data:image/svg+xml;base64,${company.company_logo}`}
+                            onError={(e) => { e.target.onerror = null; e.target.src = `data:image/png;base64,${company.company_logo}`; }}
                             alt={displayCompany} 
                             className="w-12 h-12 rounded-xl object-contain border border-gray-100 flex-shrink-0 bg-white"
                           />
@@ -121,9 +122,16 @@ export default function HrDashboard() {
                         )}
 
                         <div className="min-w-0 flex-1">
-                          <h3 className="text-base font-bold text-gray-800 tracking-tight line-clamp-2 leading-snug group-hover:text-[#C1272D] transition-colors">
-                            {displayTitle}
-                          </h3>
+                          <div className="flex items-start justify-between gap-2">
+                            <h3 className="text-base font-bold text-gray-800 tracking-tight line-clamp-2 leading-snug group-hover:text-[#C1272D] transition-colors">
+                              {displayTitle}
+                            </h3>
+                            {details?.end_date && (
+                              <span className="text-[10px] font-bold text-[#C1272D] whitespace-nowrap flex-shrink-0 mt-0.5">
+                                Till {formatDate(details.end_date)}
+                              </span>
+                            )}
+                          </div>
                           <div className="flex items-center gap-2 mt-1.5">
                             <span className="text-sm font-semibold text-gray-500 truncate">{displayCompany}</span>
                           </div>

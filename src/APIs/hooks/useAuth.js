@@ -114,14 +114,16 @@ const useAuth = () => {
           data.candidate_registration_done === true ||
           data.candidate_registration_done === "true";
 
-        if (data.user_type === "recruiter") {
+        if (data.user_type === "admin") {
+          navigate("/admin");
+        } else if (data.user_type === "recruiter") {
           if (isRecruiterDone) {
             navigate("/hrDashbaord");
           } else {
             navigate("/hr");
           }
         } else if (data.user_type === "employer") {
-          navigate("/compnay");  // ✅ employer route added
+          navigate("/compnay");
         } else if (data.user_type === "candidate") {
           if (isCandidateDone) {
             navigate("/candidates");

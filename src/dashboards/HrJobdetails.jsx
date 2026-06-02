@@ -102,12 +102,24 @@ export default function HrJobdetails() {
           <div className="bg-white rounded-2xl p-6 border border-gray-100/80 shadow-xs">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div className="flex items-center gap-4">
-                <div
-                  className="w-16 h-16 rounded-xl flex items-center justify-center font-bold text-2xl flex-shrink-0 border border-gray-100 shadow-inner"
-                  style={{ background: palette.bg, color: palette.text }}
-                >
-                  {companyLetter}
-                </div>
+                {company?.company_logo ? (
+                  <img
+                    src={`data:image/svg+xml;base64,${company.company_logo}`}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = `data:image/png;base64,${company.company_logo}`;
+                    }}
+                    alt={details.client_selection || 'Company Logo'}
+                    className="w-16 h-16 rounded-xl object-contain border border-gray-100 flex-shrink-0 bg-white shadow-inner"
+                  />
+                ) : (
+                  <div
+                    className="w-16 h-16 rounded-xl flex items-center justify-center font-bold text-2xl flex-shrink-0 border border-gray-100 shadow-inner"
+                    style={{ background: palette.bg, color: palette.text }}
+                  >
+                    {companyLetter}
+                  </div>
+                )}
                 <div>
                   <h1 className="text-2xl font-black text-gray-900 tracking-tight">{details.name || 'Untitled Position'}</h1>
                   <p className="text-[15px] text-gray-500 font-bold mt-0.5">{details.client_selection || 'Direct Placement'}</p>
@@ -355,7 +367,3 @@ export default function HrJobdetails() {
     </div>
   );
 }
-
-
-
-

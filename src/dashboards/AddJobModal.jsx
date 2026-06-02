@@ -155,7 +155,6 @@ const Tag = ({ text, onRemove }) => (
 );
 
 const STEPS = [
-    { label: "Create Department", icon: "🏢" },
     { label: "Job Details", icon: "💼" },
     { label: "Candidate Preferences", icon: "👤" },
     { label: "Screening Questions", icon: "🔍" },
@@ -169,18 +168,18 @@ const STEPS = [
 export default function AddJobModal({ onClose, onCreateJob }) {
     const [step, setStep] = useState(0);
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [isDeptCreated, setIsDeptCreated] = useState(false); 
+    const [customDeptInput, setCustomDeptInput] = useState("");
     const fileInputRef = useRef(null);
 
     const { 
         createJob, 
-        createDepartment, 
+        createDepartment,
         fetchDepartments, 
         fetchLanguages, 
         departments, 
         languages, 
         loading,
-        deptLoading  
+        deptLoading
     } = useHr();
 
     useEffect(() => {
@@ -190,16 +189,9 @@ export default function AddJobModal({ onClose, onCreateJob }) {
         return () => { document.body.style.overflow = ''; };
     }, []);
 
-    const handleStepChange = (i) => {
-        if (i > 0 && !isDeptCreated) return;
-        setStep(i);
-        setSidebarOpen(false);
-    };
-
     const [form, setForm] = useState({
-        newDepartmentName: "",
         companyName: "", jobTitle: "", department: "", gender: "", minExp: "", maxExp: "",
-        minSalary: "", maxSalary: "",
+        minSalary: "", maxSalary: "", date_to: "",
         perks: [],
         qualification: "", industry: "", candMinExp: "", candMaxExp: "",
         languages: [], requiredSkills: [],
@@ -220,17 +212,23 @@ export default function AddJobModal({ onClose, onCreateJob }) {
     const set = (key, val) => setForm(f => ({ ...f, [key]: val }));
     const toggleBenefit = (key) => setForm(f => ({ ...f, benefits: { ...f.benefits, [key]: !f.benefits[key] } }));
 
-    const handleCreateDepartmentClick = async () => {
-        if (!form.newDepartmentName.trim()) return;
+    const handleStepChange = (i) => {
+        setStep(i);
+        setSidebarOpen(false);
+    };
+
+    const handleNextClick = () => {
+        setStep(s => s + 1);
+    };
+
+    const handleCreateCustomDepartment = async () => {
+        if (!customDeptInput.trim()) return;
         try {
-            const success = await createDepartment(form.newDepartmentName.trim());
+            const success = await createDepartment(customDeptInput.trim());
             if (success) {
-                setIsDeptCreated(true);
-                set("department", form.newDepartmentName.trim());
-                fetchDepartments();
-                setTimeout(() => {
-                    setStep(1);
-                }, 500);
+                set("department", customDeptInput.trim());
+                setCustomDeptInput("");
+                fetchDepartments(); 
             }
         } catch (err) {
             console.error(err);
@@ -268,55 +266,8 @@ export default function AddJobModal({ onClose, onCreateJob }) {
 
     const renderStep = () => {
         switch (step) {
-            case 0: return (
-                <div className="space-y-5 md:space-y-6">
-                    <SectionHeader icon="🏢" title="Create Department" />
-                    <div className="w-full md:w-1/2">
-                        <Label text="Department Name" required />
-                        <Input 
-                            placeholder="Ex. Mobile Development, UI/UX Design" 
-                            value={form.newDepartmentName} 
-                            onChange={v => {
-                                set("newDepartmentName", v);
-                                if (isDeptCreated) setIsDeptCreated(false);
-                            }} 
-                            allowOnly="chars" 
-                        />
-                    </div>
-
-                    <div className="pt-2">
-                        <button
-                            type="button"
-                            disabled={!form.newDepartmentName.trim() || deptLoading}
-                            onClick={handleCreateDepartmentClick}
-                            className={`w-full sm:w-auto px-6 py-3 font-bold text-sm rounded-xl transition-all shadow-sm ${
-                                isDeptCreated
-                                    ? "bg-green-600 text-white cursor-default"
-                                    : "bg-[#C1272D] hover:bg-[#a61f24] text-white disabled:opacity-50 disabled:pointer-events-none"
-                            }`}
-                        >
-                            {deptLoading ? (
-                                <span className="flex items-center gap-2 justify-center">
-                                    <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                                    </svg>
-                                    Creating...
-                                </span>
-                            ) : isDeptCreated ? (
-                                "✓ Department Created / Verified"
-                            ) : (
-                                "Create Department"
-                            )}
-                        </button>
-                    </div>
-                </div>
-            );
-            case 1:
-                const dynamicDeptOptions = Array.from(new Set([
-                    form.newDepartmentName.trim(),
-                    ...departments.map(d => typeof d === 'object' ? (d.name || d.department_name) : d)
-                ])).filter(Boolean);
+            case 0:
+                const dynamicDeptOptions = departments.map(d => typeof d === 'object' ? (d.name || d.department_name) : d).filter(Boolean);
 
                 return (
                     <div className="space-y-4 md:space-y-6">
@@ -328,12 +279,34 @@ export default function AddJobModal({ onClose, onCreateJob }) {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
                             <div>
                                 <Label text="Department" required />
-                                <Select
-                                    placeholder="Select Department"
-                                    value={form.department}
-                                    onChange={v => set("department", v)}
-                                    options={dynamicDeptOptions}
-                                />
+                                <div className="space-y-3">
+                                    <Select
+                                        placeholder="Select Existing Department"
+                                        value={dynamicDeptOptions.includes(form.department) ? form.department : ""}
+                                        onChange={v => set("department", v)}
+                                        options={dynamicDeptOptions}
+                                    />
+                                    <div className="pt-1">
+                                        <label className="block text-xs font-semibold text-gray-400 mb-1">Or create & add new department (Optional):</label>
+                                        <div className="flex gap-2 items-center">
+                                            <input 
+                                                type="text"
+                                                placeholder="Ex. Customer Support"
+                                                value={customDeptInput}
+                                                onChange={e => setCustomDeptInput(e.target.value)}
+                                                className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-700 focus:outline-none focus:border-[#C1272D] bg-white transition"
+                                            />
+                                            <button
+                                                type="button"
+                                                disabled={!customDeptInput.trim() || deptLoading}
+                                                onClick={handleCreateCustomDepartment}
+                                                className="bg-[#C1272D] hover:bg-[#a61f24] text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-xs disabled:opacity-40 whitespace-nowrap flex items-center justify-center min-w-[70px]"
+                                            >
+                                                {deptLoading ? "Creating..." : "Create"}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <div>
                                 <Label text="Gender Preference" />
@@ -345,11 +318,17 @@ export default function AddJobModal({ onClose, onCreateJob }) {
                                 />
                             </div>
                         </div>
-                        <div>
-                            <Label text="Work experience" required />
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
-                                <Select placeholder="Min. experience" value={form.minExp} onChange={v => set("minExp", v)} options={["0", "1", "2", "3", "4", "5", "6", "7", "8", "10+"]} />
-                                <Select placeholder="Max. experience" value={form.maxExp} onChange={v => set("maxExp", v)} options={["1", "2", "3", "4", "5", "6", "7", "8", "10", "15+"]} />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+                            <div>
+                                <Label text="Work experience" required />
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
+                                    <Select placeholder="Min. experience" value={form.minExp} onChange={v => set("minExp", v)} options={["0", "1", "2", "3", "4", "5", "6", "7", "8", "10+"]} />
+                                    <Select placeholder="Max. experience" value={form.maxExp} onChange={v => set("maxExp", v)} options={["1", "2", "3", "4", "5", "6", "7", "8", "10", "15+"]} />
+                                </div>
+                            </div>
+                            <div>
+                                <Label text="Hiring Close Date" />
+                                <Input type="date" placeholder="Select date" value={form.date_to} onChange={v => set("date_to", v)} allowOnly="all" />
                             </div>
                         </div>
                         <div>
@@ -361,7 +340,7 @@ export default function AddJobModal({ onClose, onCreateJob }) {
                         </div>
                     </div>
                 );
-            case 2:
+            case 1:
                 const dynamicLangOptions = languages.map(l => typeof l === 'object' ? l.name : l).filter(Boolean);
 
                 return (
@@ -397,7 +376,7 @@ export default function AddJobModal({ onClose, onCreateJob }) {
                             </div>
                             <div className="flex gap-2 w-full md:w-1/2">
                                 <input type="text" placeholder="Add custom skill" value={customReqSkill} onChange={e => setCustomReqSkill(e.target.value)}
-                                    className="flex-1 border border-gray-200 rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-[#C1272D]" />
+                                    className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#C1272D]" />
                                 <button type="button" onClick={() => { if (customReqSkill.trim()) { set("requiredSkills", [...form.requiredSkills, customReqSkill.trim()]); setCustomReqSkill(""); } }}
                                     className="bg-[#C1272D] text-white text-xs font-bold px-3 py-1.5 rounded-xl hover:bg-[#a61f24]">Add</button>
                             </div>
@@ -405,7 +384,7 @@ export default function AddJobModal({ onClose, onCreateJob }) {
                         <div><Label text="Certifications" required /><Textarea placeholder="Add certifications" value={form.certifications} onChange={v => set("certifications", v)} rows={3} /></div>
                     </div>
                 );
-            case 3: return (
+            case 2: return (
                 <div className="space-y-4 md:space-y-6">
                     <SectionHeader icon="🔍" title="Screening Questions" />
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-5">
@@ -443,7 +422,7 @@ export default function AddJobModal({ onClose, onCreateJob }) {
                     )}
                 </div>
             );
-            case 4: return (
+            case 3: return (
                 <div className="space-y-4 md:space-y-6">
                     <SectionHeader icon="📄" title="Job Description" />
                     <div><Label text="About the Role" required /><Textarea placeholder="Briefly describe the role" value={form.aboutRole} onChange={v => set("aboutRole", v)} rows={5} /></div>
@@ -468,7 +447,7 @@ export default function AddJobModal({ onClose, onCreateJob }) {
                     </div>
                 </div>
             );
-            case 5: return (
+            case 4: return (
                 <div className="space-y-4 md:space-y-5">
                     <SectionHeader icon="📡" title="Communication Preferences" />
                     <div className="space-y-3">
@@ -495,7 +474,7 @@ export default function AddJobModal({ onClose, onCreateJob }) {
                     </div>
                 </div>
             );
-            case 6: return (
+            case 5: return (
                 <div className="space-y-4 md:space-y-6">
                     <SectionHeader icon="🎁" title="Benefits & Perks" />
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
@@ -518,7 +497,7 @@ export default function AddJobModal({ onClose, onCreateJob }) {
                     </div>
                 </div>
             );
-            case 7: return (
+            case 6: return (
                 <div className="space-y-4 md:space-y-6">
                     <SectionHeader icon="🏗️" title="Company Details" />
                     <div>
@@ -557,7 +536,7 @@ export default function AddJobModal({ onClose, onCreateJob }) {
                     </div>
                 </div>
             );
-            case 8: return (
+            case 7: return (
                 <div className="space-y-4 md:space-y-6">
                     <SectionHeader icon="✅" title="Review & Publish" />
                     <div className="bg-green-50 border border-green-100 rounded-2xl p-4 md:p-5">
@@ -616,44 +595,32 @@ export default function AddJobModal({ onClose, onCreateJob }) {
                 </div>
 
                 <div className="flex-1 overflow-y-auto py-3 px-3">
-                    {STEPS.map((s, i) => {
-                        const isClickable = i === 0 || isDeptCreated;
-                        return (
-                            <button
-                                key={i}
-                                disabled={!isClickable}
-                                onClick={() => handleStepChange(i)}
-                                className={`w-full text-left flex items-center gap-3 px-3 py-3 rounded-xl mb-1 text-sm transition-all ${
-                                    i === step
-                                        ? "bg-red-50 text-[#C1272D] font-bold border border-red-100"
-                                        : i < step
-                                        ? "text-gray-600 font-semibold hover:bg-gray-50"
-                                        : isClickable
-                                        ? "text-gray-400 hover:bg-gray-50 hover:text-gray-600"
-                                        : "text-gray-300 opacity-50 cursor-not-allowed"
-                                }`}
-                            >
-                                <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold border-2 transition ${
-                                    i < step
-                                        ? "bg-[#C1272D] border-[#C1272D] text-white"
-                                        : i === step
-                                        ? "bg-[#C1272D] border-[#C1272D] text-white"
-                                        : "border-gray-300 text-gray-400"
-                                }`}>
-                                    {i < step ? (
-                                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    ) : (
-                                        i + 1
-                                    )}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <p className="truncate">{s.label}</p>
-                                </div>
-                            </button>
-                        );
-                    })}
+                    {STEPS.map((s, i) => (
+                        <button
+                            key={i}
+                            onClick={() => handleStepChange(i)}
+                            className={`w-full text-left flex items-center gap-3 px-3 py-3 rounded-xl mb-1 text-sm transition-all ${
+                                i === step
+                                    ? "bg-red-50 text-[#C1272D] font-bold border border-red-100"
+                                    : "text-gray-600 font-semibold hover:bg-gray-50"
+                            }`}
+                        >
+                            <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold border-2 transition ${
+                                i <= step ? "bg-[#C1272D] border-[#C1272D] text-white" : "border-gray-300 text-gray-400"
+                            }`}>
+                                {i < step ? (
+                                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                ) : (
+                                    i + 1
+                                )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <p className="truncate">{s.label}</p>
+                            </div>
+                        </button>
+                    ))}
                 </div>
 
                 <div className="px-5 py-4 border-t border-gray-100">
@@ -675,28 +642,18 @@ export default function AddJobModal({ onClose, onCreateJob }) {
                 <div className="hidden md:flex w-72 flex-shrink-0 bg-gray-50 border-r border-gray-100 flex-col py-8 px-5">
                     <p className="text-xs font-bold text-[#C1272D] uppercase tracking-widest mb-6">Find The Right Talent Faster</p>
                     <div className="flex flex-col space-y-1 flex-1">
-                        {STEPS.map((s, i) => {
-                            const isClickable = i === 0 || isDeptCreated;
-                            return (
-                                <button key={i}
-                                    disabled={!isClickable}
-                                    onClick={() => setStep(i)}
-                                    className={`w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all ${
-                                        i === step
-                                            ? "bg-white shadow-sm text-[#C1272D] font-bold"
-                                            : i < step
-                                            ? "text-gray-600 font-semibold hover:text-gray-900"
-                                            : isClickable
-                                            ? "text-gray-400 hover:text-gray-600 cursor-pointer"
-                                            : "text-gray-300 cursor-not-allowed opacity-60"
-                                    }`}>
-                                    <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 border-2 transition ${
-                                        i < step ? "bg-[#C1272D] border-[#C1272D]" : i === step ? "bg-[#C1272D] border-[#C1272D]" : "border-gray-300"
-                                    }`} />
-                                    <span>{s.label}</span>
-                                </button>
-                            );
-                        })}
+                        {STEPS.map((s, i) => (
+                            <button key={i}
+                                onClick={() => handleStepChange(i)}
+                                className={`w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all cursor-pointer ${
+                                    i === step ? "bg-white shadow-sm text-[#C1272D] font-bold" : "text-gray-600 font-semibold hover:text-gray-900"
+                                }`}>
+                                <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 border-2 transition ${
+                                    i <= step ? "bg-[#C1272D] border-[#C1272D]" : "border-gray-300"
+                                }`} />
+                                <span>{s.label}</span>
+                            </button>
+                        ))}
                     </div>
                 </div>
 
@@ -744,9 +701,8 @@ export default function AddJobModal({ onClose, onCreateJob }) {
                             </button>
                         )}
                         {step < STEPS.length - 1 ? (
-                            <button onClick={() => setStep(s => s + 1)}
-                                disabled={step === 0 && !isDeptCreated}
-                                className="flex-1 bg-[#C1272D] hover:bg-[#a61f24] text-white font-bold py-3 md:py-3.5 rounded-xl text-xs md:text-sm transition shadow-md disabled:opacity-40 disabled:pointer-events-none"
+                            <button onClick={handleNextClick}
+                                className="flex-1 bg-[#C1272D] hover:bg-[#a61f24] text-white font-bold py-3 md:py-3.5 rounded-xl text-xs md:text-sm transition shadow-md"
                             >
                                 Next
                             </button>

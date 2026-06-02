@@ -21,7 +21,14 @@ function Navbar() {
   const userType = localStorage.getItem("user_type"); 
 
   const isHR = userType?.toLowerCase() === "hr" || userType?.toLowerCase() === "recruiter";
-  const dashboardLink = isHR ? "/hrDashbaord" : "/candidates";
+  const isAdmin = userType?.toLowerCase() === "admin";
+
+  let dashboardLink = "/candidates"; 
+  if (isAdmin) {
+    dashboardLink = "/admin";
+  } else if (isHR) {
+    dashboardLink = "/hrDashbaord";
+  }
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -63,7 +70,7 @@ function Navbar() {
 
         .user-dropdown {
           position: absolute; top: calc(100% + 2px); right: 0;
-          background: white; border-radius: 16px; min-width: 200px;
+          background: white; border-radius: 16px; min-width: 160px;
           box-shadow: 0px 8px 30px rgba(200,16,46,0.15), 0px 2px 8px rgba(0,0,0,0.08);
           overflow: hidden; z-index: 100;
           border: 1px solid #FFE0E4;
@@ -77,12 +84,10 @@ function Navbar() {
           style={{ boxShadow: "0px 4px 30px rgba(0, 0, 0, 0.06)" }}
         >
 
-          {/* Logo */}
           <a href="/" className="flex-shrink-0">
             <img src={Logo} alt="Kalibre" className="h-10 md:h-11 w-auto object-contain" />
           </a>
 
-          {/* Desktop links */}
           <ul className="hidden lg:flex items-center gap-6 xl:gap-9">
             {navLinks.map((link) => (
               <li key={link.label}>
@@ -106,56 +111,39 @@ function Navbar() {
                   Dashboard
                 </a>
 
-                <div className="relative" ref={dropdownRef}>
-                  <button
-                    onClick={() => setDropdownOpen((p) => !p)}
-                    className="login-btn flex items-center gap-2 font-semibold text-[14px] px-5 py-2.5 rounded-full"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                    {userName}
-                    <svg xmlns="http://www.w3.org/2000/svg" className={`h-3.5 w-3.5 transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-
-                  {dropdownOpen && (
-                    <div className="user-dropdown">
-                      <button
-                        onClick={handleLogout}
-                        className="w-full flex items-center gap-2 px-5 py-3.5 text-[14px] font-semibold text-[#C8102E] hover:bg-[#FFF0F0] transition-colors duration-200"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1" />
-                        </svg>
-                        Logout
-                      </button>
-                    </div>
-                  )}
-                </div>
+                <button
+                  onClick={handleLogout}
+                  className="login-btn flex items-center gap-2 font-semibold text-[14px] px-5 py-2.5 rounded-full"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1" />
+                  </svg>
+                  Logout
+                </button>
               </>
             ) : (
-              <a
-                href="/register"
-                className="login-btn flex items-center gap-2 font-semibold text-[14px] px-5 py-2.5 rounded-full"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                Register
-              </a>
-            )}
+              <>
+                <a
+                  href="/login"
+                  className="login-btn flex items-center gap-2 font-semibold text-[14px] px-5 py-2.5 rounded-full"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  Login
+                </a>
 
-            <a
-              href="/register"
-              className="hire-btn flex items-center gap-2 text-white font-semibold text-[14px] px-6 py-2.5 rounded-full"
-            >
-              Hire Talent
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M7 7h10v10" />
-              </svg>
-            </a>
+                <a
+                  href="/register"
+                  className="hire-btn flex items-center gap-2 text-white font-semibold text-[14px] px-6 py-2.5 rounded-full"
+                >
+                  Hire Talent
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M7 7h10v10" />
+                  </svg>
+                </a>
+              </>
+            )}
           </div>
 
           <button
@@ -199,20 +187,22 @@ function Navbar() {
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1" />
                       </svg>
-                      {userName} — Logout
+                      Logout
                     </button>
                   </>
                 ) : (
-                  <a href="/login" className="login-btn inline-flex items-center gap-2 font-semibold text-[14px] px-5 py-2.5 rounded-full">
-                    Login
-                  </a>
+                  <>
+                    <a href="/login" className="login-btn inline-flex items-center gap-2 font-semibold text-[14px] px-5 py-2.5 rounded-full">
+                      Login
+                    </a>
+                    <a href="/register" className="hire-btn inline-flex items-center gap-2 text-white font-semibold text-[14px] px-6 py-2.5 rounded-full">
+                      Hire Talent
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M7 7h10v10" />
+                      </svg>
+                    </a>
+                  </>
                 )}
-                <a href="/register" className="hire-btn inline-flex items-center gap-2 text-white font-semibold text-[14px] px-6 py-2.5 rounded-full">
-                  Hire Talent
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M7 7h10v10" />
-                  </svg>
-                </a>
               </li>
             </ul>
           </div>

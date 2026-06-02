@@ -23,6 +23,7 @@ import HrDashboard from "../dashboards/HrDashboard";
 import MyProfile from "../dashboards/UserProfile";
 import HrDetails from "../dashboards/HrJobdetails";
 import CompnayDashbaord from "../Company/CompnayDashbaord";
+import AdminDashboard from "../dashboards/AdminDashboard";
 
 // ───── Route Guards ─────
 
@@ -65,14 +66,24 @@ const ProtectedRouteEmployer = ({ children }) => {
   return children;
 };
 
-// ✅ NEW — allows ANY logged-in user (candidate, HR, recruiter, employer)
+
 const ProtectedRouteAny = ({ children }) => {
   const token = localStorage.getItem("token");
   if (!token) return <Navigate to="/login" replace />;
   return children;
 };
 
-// ───── Routes ─────
+
+const ProtectedRouteAdmin = ({ children }) => {
+  const token = localStorage.getItem("token");
+  const userType = localStorage.getItem("user_type");
+  const isAdmin = userType?.toLowerCase() === "admin";
+
+  if (!token) return <Navigate to="/login" replace />;
+  if (!isAdmin) return <Navigate to="/" replace />;
+  return children;
+};
+
 
 const router = createBrowserRouter([
   {
@@ -102,7 +113,6 @@ const router = createBrowserRouter([
     element: <ProtectedRouteCandidate><CandidateDashbaord /></ProtectedRouteCandidate>,
   },
 
-  // ✅ UPDATED — /profile now accessible by ALL logged-in users
   {
     path: "/profile",
     element: <ProtectedRouteAny><MyProfile /></ProtectedRouteAny>,
@@ -113,7 +123,6 @@ const router = createBrowserRouter([
     element: <ProtectedRouteCandidate><JobDetailsPage /></ProtectedRouteCandidate>,
   },
 
-  // Auth Routes
   {
     path: "/register",
     element: <PublicRoute><Register /></PublicRoute>,
@@ -131,7 +140,6 @@ const router = createBrowserRouter([
     element: <PublicRoute><HrRegister /></PublicRoute>,
   },
 
-  // HR/Recruiter Routes
   {
     path: "/hrDashbaord",
     element: <ProtectedRouteHR><HrDashboard /></ProtectedRouteHR>,
@@ -141,10 +149,14 @@ const router = createBrowserRouter([
     element: <ProtectedRouteHR><HrDetails /></ProtectedRouteHR>,
   },
 
-  // Employer Route
   {
     path: "/compnay",
     element: <ProtectedRouteEmployer><CompnayDashbaord /></ProtectedRouteEmployer>,
+  },
+
+  {
+    path: "/admin",
+    element: <ProtectedRouteAdmin><AdminDashboard /></ProtectedRouteAdmin>,
   },
 ]);
 

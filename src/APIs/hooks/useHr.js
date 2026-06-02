@@ -80,7 +80,7 @@ export default function useHr() {
         setDeptLoading(true);
         setError(null);
         try {
-            const payload = { name: departmentName };
+            const payload = { name: departmentName, is_kalibre: "true" };
             const data = await createDepartmentService(payload);
             toast.success(data.message || "Department Verified/Created Successfully! 🏢");
             return true;
@@ -123,11 +123,28 @@ export default function useHr() {
         setLoading(true);
         setError(null);
         try {
+
+            // Map selected department name → numeric ID
+            const selectedDepartmentIds = departments
+                .filter(d => {
+                    const name = typeof d === 'object' ? (d.name || d.department_name) : d;
+                    return name === form.department;
+                })
+                .map(d => d.id);
+
+            // Map selected language names → numeric IDs
+            const selectedLanguageIds = languages
+                .filter(l => {
+                    const name = typeof l === 'object' ? l.name : l;
+                    return form.languages.includes(name);
+                })
+                .map(l => l.id);
+
             const payload = {
                 job_details: {
                     name: form.jobTitle,
                     client_selection: form.companyName,
-                    department_names: [form.department],
+                    department_ids: selectedDepartmentIds,
                     location: form.jobLocation,
                     experience_from: parseFloat(form.minExp) || 0,
                     experience_to: parseFloat(form.maxExp) || 0,
@@ -135,9 +152,10 @@ export default function useHr() {
                     budget_to: parseFloat(form.maxSalary) || 0,
                     no_of_recruitment: parseInt(form.openPositions) || 1,
                     gender: form.gender ? form.gender.toLowerCase() : "any",
+                    date_to: form.date_to
                 },
                 candidate_preferences: {
-                    language_name: form.languages.join(", "),
+                    language_id: selectedLanguageIds,
                     skills: form.requiredSkills.join(", "),
                     certifications: form.certifications,
                     required_qualifications: form.qualification,
@@ -181,6 +199,8 @@ export default function useHr() {
             setLoading(false);
         }
     };
+
+
 
     const publishJob = async (job_position_id, setJobsState) => {
         try {
