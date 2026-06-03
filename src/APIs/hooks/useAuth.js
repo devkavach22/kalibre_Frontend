@@ -90,7 +90,6 @@ const useAuth = () => {
         role: formData.role || "candidate",
       };
       const data = await loginUser(payload);
-
       if (data.token) {
         localStorage.setItem("token", data.token);
         localStorage.setItem("user_name", data.user_name || "");
@@ -110,9 +109,15 @@ const useAuth = () => {
         const isRecruiterDone =
           data.recruiter_registration_done === true ||
           data.recruiter_registration_done === "true";
+
         const isCandidateDone =
           data.candidate_registration_done === true ||
           data.candidate_registration_done === "true";
+
+        console.log("API Response data:", data);
+        console.log("candidate_registration_done raw value:", data.candidate_registration_done);
+        console.log("typeof candidate_registration_done:", typeof data.candidate_registration_done);
+        console.log("isCandidateDone result:", isCandidateDone);
 
         if (data.user_type === "admin") {
           navigate("/admin");

@@ -1,33 +1,11 @@
-import { useState } from "react";
-import DashboardNavbar from '../dashboards/DashboardNavbar';
+import { useProfile } from "../APIs/hooks/useProfile";
+import DashboardNavbar from "../dashboards/DashboardNavbar";
 
 const RED = "#DC2626";
 const PINK_BG = "#FFF1F1";
 const PINK_BORDER = "#FFE4E4";
 
-// ─── Icons ───────────────────────────────────────────────────────────────────
-
-const LocationIcon = () => (
-  <svg className="w-4 h-4 flex-shrink-0" style={{ color: RED }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-  </svg>
-);
-const EmailIcon = () => (
-  <svg className="w-4 h-4 flex-shrink-0" style={{ color: RED }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-  </svg>
-);
-const PhoneIcon = () => (
-  <svg className="w-4 h-4 flex-shrink-0" style={{ color: RED }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-  </svg>
-);
-const CalendarIcon = () => (
-  <svg className="w-4 h-4 flex-shrink-0" style={{ color: RED }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-  </svg>
-);
+// ─── SVG Icons ─────────────────────────────────────────────────────────────
 const CameraIcon = () => (
   <svg className="w-3.5 h-3.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
@@ -37,6 +15,11 @@ const CameraIcon = () => (
 const EditIcon = () => (
   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+  </svg>
+);
+const ExternalLinkIcon = () => (
+  <svg className="w-4 h-4 ml-1.5 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
   </svg>
 );
 
@@ -59,22 +42,10 @@ const GraduationStatIcon = () => (
     </svg>
   </StatIcon>
 );
-const PersonStatIcon = () => (
-  <StatIcon>
-    <svg className="w-5 h-5" style={{ color: RED }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-    </svg>
-  </StatIcon>
-);
-
-// ─── Reusable Components ──────────────────────────────────────────────────────
 
 function Card({ children, className = "" }) {
   return (
-    <div
-      className={`bg-white rounded-2xl border shadow-sm overflow-hidden ${className}`}
-      style={{ borderColor: PINK_BORDER }}
-    >
+    <div className={`bg-white rounded-2xl border shadow-sm overflow-hidden ${className}`} style={{ borderColor: PINK_BORDER }}>
       {children}
     </div>
   );
@@ -82,10 +53,7 @@ function Card({ children, className = "" }) {
 
 function SectionHeader({ title, actionLabel, onAction, iconAction }) {
   return (
-    <div
-      className="px-7 py-4 flex justify-between items-center border-b"
-      style={{ background: PINK_BG, borderColor: PINK_BORDER }}
-    >
+    <div className="px-7 py-4 flex justify-between items-center border-b" style={{ background: PINK_BG, borderColor: PINK_BORDER }}>
       <h3 className="text-base font-bold text-gray-800">{title}</h3>
       {actionLabel && (
         <button onClick={onAction} className="text-sm font-semibold hover:underline transition" style={{ color: RED }}>
@@ -101,243 +69,319 @@ function SectionHeader({ title, actionLabel, onAction, iconAction }) {
   );
 }
 
-function AvatarSVG() {
+function DefaultAvatar({ base64 }) {
+  if (base64) {
+    return <img src={`data:image/png;base64,${base64}`} alt="Logo" className="w-full h-full object-cover" />;
+  }
   return (
     <svg viewBox="0 0 100 100" className="w-full h-full">
       <rect width="100" height="100" fill="#f0d5b0" />
       <circle cx="50" cy="38" r="18" fill="#c8956c" />
       <ellipse cx="50" cy="90" rx="30" ry="24" fill="#c8956c" />
-      <path d="M32 38 Q50 13 68 38 Q66 19 50 17 Q34 19 32 38z" fill="#6b3a1f" />
-      <path d="M32 38 Q27 62 30 78 Q36 56 33 43z" fill="#6b3a1f" />
-      <path d="M68 38 Q73 62 70 78 Q64 56 67 43z" fill="#6b3a1f" />
-      <circle cx="43" cy="38" r="2" fill="#7a4a30" />
-      <circle cx="57" cy="38" r="2" fill="#7a4a30" />
-      <path d="M44 47 Q50 52 56 47" stroke="#a0522d" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-      <rect x="28" y="72" width="44" height="28" rx="4" fill="#e8e0d8" />
     </svg>
   );
 }
 
-// ─── Profile Data ─────────────────────────────────────────────────────────────
-
-const profile = {
-  name: "Jimmy Cartel",
-  title: "Information Technology Specialist At Microsoft",
-  verified: true,
-  location: "Bangalore, Karnataka, India",
-  email: "Jimmycartel@Gmail.Com",
-  phone: "+91 98565 58752",
-  dob: "15 May 1995",
-  experience: "5.6 Year",
-  education: "B.Tech Computer Science",
-  currentRole: "Software Engineer At Tech Solutions Pvt. Ltd.",
-  about: `Passionate And Results-Driven Software Engineer With 5.6 Years Of Professional Experience In Designing, Developing, And Maintaining Scalable Web Applications And Enterprise-Grade Digital Solutions. Skilled In Building High-Performance Applications With A Strong Focus On Clean Architecture, User Experience, Performance Optimization, And Problem-Solving. Experienced In Working Across The Full Software Development Lifecycle, From Requirement Analysis And System Design To Deployment And Maintenance.
-
-I Enjoy Working With Modern Technologies And Continuously Exploring Innovative Tools, Frameworks, And Development Practices To Create Efficient And Reliable Solutions. Adept At Developing Responsive And User-Friendly Applications While Ensuring Code Quality, Security, And Scalability. Strong Understanding Of Front-End And Back-End Development, API Integrations, Database Management, And Cloud-Based Deployment Workflows.`,
-  educationList: [
-    {
-      degree: "MPHIL Agriculture",
-      college: "Christ College Institute of Management, Bangalore",
-      year: "2021-2025",
-      type: "Full Time",
-    },
-    {
-      degree: "MPHIL Agriculture",
-      college: "Christ College Institute of Management, Bangalore",
-      year: "2021-2025",
-      type: "Full Time",
-    },
-  ],
-  employment: [
-    {
-      role: "Senior Software Engineer",
-      company: "techNova Solutions Pvt. Ltd. Bangalore, Karnataka",
-      duration: "June 2025 – Present | Full Time",
-      skills: "Primary Skills: React.Js, Node.Js, TypeScript, MongoDB, AWS",
-    },
-    {
-      role: "Senior Software Engineer",
-      company: "techNova Solutions Pvt. Ltd. Bangalore, Karnataka",
-      duration: "June 2025 – Present | Full Time",
-      skills: "Primary Skills: React.Js, Node.Js, TypeScript, MongoDB, AWS",
-    },
-  ],
-  skills: [
-    "Non IT Recruitment", "Volume Hiring", "End To End Recruitment",
-    "Bpo Recruitment", "Bulk Hiring", "Talent Acquisition",
-    "Sourcing Profiles", "Interview Coordination", "Workforce Management",
-    "Payroll Management",
-  ],
-};
-
-// ─── Main Component ───────────────────────────────────────────────────────────
-
 export default function UserProfile() {
+  const { profile, loading, error } = useProfile();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-lg font-semibold" style={{ color: RED }}>Loading profile configuration...</div>
+      </div>
+    );
+  }
+
+  if (error || !profile) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="bg-white p-6 rounded-xl border text-center max-w-sm" style={{ borderColor: PINK_BORDER }}>
+          <p className="text-red-600 font-bold mb-2">Error Loading Data</p>
+          <p className="text-gray-600 text-sm">{error || "User data token could not be verified."}</p>
+        </div>
+      </div>
+    );
+  }
+
+  const role = profile.role;
+  let displayName = profile.name || "N/A";
+  let displayTitle = "User Account";
+
+  if (role === "recruiter" && profile.recruiter_details) {
+    const details = profile.recruiter_details;
+    displayName = details.full_name || displayName;
+    displayTitle = details.company_name ? `Recruiter at ${details.company_name}` : "Recruiter Management";
+  } else if (role === "candidate" && profile.candidate_details) {
+    const details = profile.candidate_details;
+    displayName = details.name || displayName;
+    displayTitle = details.current_designation ? `${details.current_designation} ${details.current_company ? `at ${details.current_company}` : ''}` : details.headline || "Job Candidate";
+  } else if (role === "employer" && profile.employer_details) {
+    const details = profile.employer_details;
+    displayName = details.company_name || displayName;
+    displayTitle = "Corporate Employer";
+  }
+
   return (
     <div className="min-h-screen font-sans" style={{ background: "#F5F6FA" }}>
-
-      {/* ── Your Built-in Navbar ── */}
       <DashboardNavbar />
 
       <div className="max-w-7xl mx-auto w-full px-6 py-6 flex flex-col gap-5">
-
-        {/* ── PROFILE HEADER CARD ── */}
-        <div
-          className="bg-white rounded-2xl border shadow-sm flex flex-row items-stretch w-full"
-          style={{ borderColor: PINK_BORDER }}
-        >
-          {/* Left: Avatar + Name + Title — top aligned together */}
-          <div className="flex items-center gap-4 px-6 py-5 flex-shrink-0">
-            {/* Avatar */}
+        
+        {/* ── DESIGNED PREMIUM PROFILE HEADER CARD ── */}
+        <div className="bg-white rounded-2xl border shadow-sm flex flex-col md:flex-row items-center justify-between w-full p-6" style={{ borderColor: PINK_BORDER }}>
+          
+          {/* Left Side: Avatar & Quick Info */}
+          <div className="flex items-center gap-5 w-full md:w-auto">
             <div className="relative flex-shrink-0">
-              <div className="w-[90px] h-[90px] rounded-full overflow-hidden border-2 border-gray-200 shadow-sm">
-                <AvatarSVG />
+              <div className="w-[84px] h-[84px] rounded-full overflow-hidden border-2 border-gray-100 shadow-sm bg-gray-50 flex items-center justify-center">
+                <DefaultAvatar base64={profile.recruiter_details?.logo_base64} />
               </div>
-              <button className="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-white border border-gray-300 flex items-center justify-center shadow-sm hover:bg-gray-50 transition">
+              <button className="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-white border border-gray-200 flex items-center justify-center shadow-sm hover:bg-gray-50 transition">
                 <CameraIcon />
               </button>
             </div>
 
-            {/* Name + Title */}
             <div>
               <div className="flex items-center gap-3 flex-wrap mb-1">
-                <h1 className="text-xl font-bold leading-tight" style={{ color: RED }}>
-                  {profile.name}
-                </h1>
-                {profile.verified && (
-                  <span
-                    className="text-xs font-semibold px-3 py-0.5 rounded-full border"
-                    style={{ color: "#16a34a", borderColor: "#86efac", background: "#f0fdf4" }}
+                <h1 className="text-xl font-bold tracking-tight text-gray-900">{displayName}</h1>
+                <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full border bg-emerald-50 text-emerald-700 border-emerald-200">
+                  Role: {role.toUpperCase()}
+                </span>
+              </div>
+              <p className="text-sm font-medium text-gray-500">{displayTitle}</p>
+            </div>
+          </div>
+
+          {/* Right Side: Website CTA Link Action Card */}
+          <div className="w-full md:w-auto mt-4 md:mt-0 pt-4 md:pt-0 border-t md:border-t-0 border-gray-100 flex items-center justify-start md:justify-end">
+            {role === "candidate" && (
+              <div className="flex items-center gap-6">
+                <div className="flex items-center gap-3">
+                  <BriefcaseStatIcon />
+                  <div>
+                    <p className="text-xs text-gray-400 font-medium">Experience</p>
+                    <p className="text-sm font-bold text-gray-800">{profile.candidate_details?.experience_years || 0} Years</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <GraduationStatIcon />
+                  <div>
+                    <p className="text-xs text-gray-400 font-medium">Highest Education</p>
+                    <p className="text-sm font-bold text-gray-800">{profile.candidate_details?.highest_education || "N/A"}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {role === "recruiter" && (
+              <div className="flex items-center gap-3 bg-gray-50 hover:bg-red-50/40 p-3 rounded-xl border border-gray-100 transition-all duration-200">
+                <BriefcaseStatIcon />
+                <div>
+                  <p className="text-xs text-gray-400 font-medium">Corporate Portal Website</p>
+                  <a 
+                    href={profile.recruiter_details?.website_url || "#"} 
+                    target="_blank" 
+                    rel="noreferrer" 
+                    className="text-sm font-bold text-gray-800 hover:text-red-600 flex items-center transition-colors"
                   >
-                    ✓ Verified
-                  </span>
-                )}
+                    {profile.recruiter_details?.website_url ? "Visit System Site" : "No Website Added"}
+                    {profile.recruiter_details?.website_url && <ExternalLinkIcon />}
+                  </a>
+                </div>
               </div>
-              <p className="text-sm text-gray-500">{profile.title}</p>
-            </div>
-          </div>
+            )}
 
-          {/* Center: Contact Info — vertically + horizontally centered */}
-          <div className="flex-1 flex items-center justify-center py-5">
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <LocationIcon /><span>{profile.location}</span>
+            {role === "employer" && (
+              <div className="flex items-center gap-3">
+                <BriefcaseStatIcon />
+                <div>
+                  <p className="text-xs text-gray-400 font-medium">PAN Number</p>
+                  <p className="text-sm font-bold text-gray-800">{profile.employer_details?.pan_number || "N/A"}</p>
+                </div>
               </div>
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <EmailIcon /><span>{profile.email}</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <PhoneIcon /><span>{profile.phone}</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <CalendarIcon /><span>{profile.dob}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Vertical divider */}
-          <div className="w-px my-5 flex-shrink-0" style={{ background: "#E5E7EB" }} />
-
-          {/* Right: Stats — fixed width, compact */}
-          <div className="flex flex-col justify-center gap-4 px-8 py-5 flex-shrink-0 w-[260px]">
-            <div className="flex items-center gap-3">
-              <BriefcaseStatIcon />
-              <div>
-                <p className="text-xs text-gray-400 font-medium mb-0.5">Experience</p>
-                <p className="text-sm font-bold text-gray-800">{profile.experience}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <GraduationStatIcon />
-              <div>
-                <p className="text-xs text-gray-400 font-medium mb-0.5">Education</p>
-                <p className="text-sm font-bold text-gray-800">{profile.education}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <PersonStatIcon />
-              <div>
-                <p className="text-xs text-gray-400 font-medium mb-0.5">Current Role</p>
-                <p className="text-sm font-bold text-gray-800 leading-snug">{profile.currentRole}</p>
-              </div>
-            </div>
+            )}
           </div>
         </div>
 
-        {/* ── TWO COLUMN LAYOUT ── */}
+        {/* ── TWO COLUMN DETAILS LAYOUT ── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
-
-          {/* ── LEFT COLUMN ── */}
-          <div className="flex flex-col gap-5">
-
-            {/* Education */}
-            <Card>
-              <SectionHeader title="Education" actionLabel="Add Education" />
-              <div className="px-7 py-6 flex flex-col gap-6">
-                {profile.educationList.map((edu, i) => (
-                  <div key={i}>
-                    <h4 className="text-base font-bold" style={{ color: RED }}>{edu.degree}</h4>
-                    <p className="text-sm text-gray-600 mt-1">{edu.college}</p>
-                    <p className="text-sm text-gray-400 mt-1">{edu.year} | {edu.type}</p>
-                    {i < profile.educationList.length - 1 && (
-                      <hr className="mt-5" style={{ borderColor: PINK_BORDER }} />
-                    )}
+          
+          {role === "recruiter" ? (
+            <>
+              {/* CARD 1: COMPANY SPECIFICATIONS */}
+              <Card>
+                <SectionHeader title="Company Details" iconAction />
+                <div className="px-7 py-5 flex flex-col gap-4 text-sm text-gray-700">
+                  <div className="flex justify-between items-center border-b pb-2" style={{ borderColor: PINK_BORDER }}>
+                    <span className="font-medium text-gray-500">Company Name</span>
+                    <span className="font-bold text-gray-900">{profile.recruiter_details?.company_name || "N/A"}</span>
                   </div>
-                ))}
-              </div>
-            </Card>
-
-            {/* Employment */}
-            <Card>
-              <SectionHeader title="Employment" actionLabel="Add Employment" />
-              <div className="px-7 py-6 flex flex-col gap-6">
-                {profile.employment.map((job, i) => (
-                  <div key={i}>
-                    <h4 className="text-base font-bold" style={{ color: RED }}>{job.role}</h4>
-                    <p className="text-sm text-gray-700 font-medium mt-1">{job.company}</p>
-                    <p className="text-sm text-gray-400 mt-1">{job.duration}</p>
-                    <p className="text-sm text-gray-500 mt-1">{job.skills}</p>
-                    {i < profile.employment.length - 1 && (
-                      <hr className="mt-5" style={{ borderColor: PINK_BORDER }} />
-                    )}
+                  <div className="flex justify-between items-center border-b pb-2" style={{ borderColor: PINK_BORDER }}>
+                    <span className="font-medium text-gray-500">Corporate Email Address</span>
+                    <span className="text-gray-900 font-medium break-all">{profile.recruiter_details?.company_email || "N/A"}</span>
                   </div>
-                ))}
+                  <div className="flex justify-between items-center border-b pb-2" style={{ borderColor: PINK_BORDER }}>
+                    <span className="font-medium text-gray-500">Corporate Phone Line</span>
+                    <span className="font-medium text-gray-900">{profile.recruiter_details?.company_phone || "N/A"}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium text-gray-500">Base Corporate Location</span>
+                    <span className="text-gray-900">{profile.recruiter_details?.current_location || "N/A"}</span>
+                  </div>
+                </div>
+              </Card>
+
+              {/* CARD 2: HUMAN RESOURCES (HR) PROFILE */}
+              <Card>
+                <SectionHeader title="Human Resources (HR) Profile" iconAction />
+                <div className="px-7 py-5 flex flex-col gap-4 text-sm text-gray-700">
+                  <div className="flex justify-between items-center border-b pb-2" style={{ borderColor: PINK_BORDER }}>
+                    <span className="font-medium text-gray-500">Full Name</span>
+                    <span className="font-bold text-gray-900" style={{ color: RED }}>{profile.recruiter_details?.full_name || "N/A"}</span>
+                  </div>
+                  <div className="flex justify-between items-center border-b pb-2" style={{ borderColor: PINK_BORDER }}>
+                    <span className="font-medium text-gray-500">Direct Contact Email</span>
+                    <span className="text-gray-900 font-medium break-all">{profile.recruiter_details?.email_address || "N/A"}</span>
+                  </div>
+                  <div className="flex justify-between items-center border-b pb-2" style={{ borderColor: PINK_BORDER }}>
+                    <span className="font-medium text-gray-500">Direct Mobile Assignment</span>
+                    <span className="font-medium text-gray-900">{profile.recruiter_details?.phone_number || "N/A"}</span>
+                  </div>
+                  <div className="flex justify-between items-center border-b pb-2" style={{ borderColor: PINK_BORDER }}>
+                    <span className="font-medium text-gray-500">Gender Definition</span>
+                    <span className="text-gray-900 capitalize font-medium">{profile.recruiter_details?.gender || "Not Specified"}</span>
+                  </div>
+                  <div className="flex justify-between items-center border-b pb-2" style={{ borderColor: PINK_BORDER }}>
+                    <span className="font-medium text-gray-500">Date of Birth</span>
+                    <span className="text-gray-900">{profile.recruiter_details?.dob || "Not Provided"}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium text-gray-500">Preferred Target Hub</span>
+                    <span className="text-gray-900 font-medium">{profile.recruiter_details?.preferred_location || "Not Provided"}</span>
+                  </div>
+                </div>
+              </Card>
+            </>
+          ) : (
+            <>
+              {/* Alternate Role layouts remain securely untouched */}
+              <div className="flex flex-col gap-5">
+                {role === "candidate" && (
+                  <>
+                    <Card>
+                      <SectionHeader title="Education" actionLabel="Add Education" />
+                      <div className="px-7 py-6 flex flex-col gap-6">
+                        {profile.candidate_details?.educations?.length > 0 ? (
+                          profile.candidate_details.educations.map((edu, i) => (
+                            <div key={i} className="border-l-2 border-red-100 pl-4">
+                              <h4 className="text-base font-bold" style={{ color: RED }}>{edu.degree || "Degree"}</h4>
+                              <p className="text-sm text-gray-600 font-medium mt-0.5">{edu.institute || "Institution Name"}</p>
+                              <p className="text-sm text-gray-400 mt-0.5">Passing Year: {edu.passing_year || "Passing Year"}</p>
+                            </div>
+                          ))
+                        ) : (
+                          <p className="text-sm text-gray-400 italic">No education entries populated.</p>
+                        )}
+                      </div>
+                    </Card>
+
+                    <Card>
+                      <SectionHeader title="Employment" actionLabel="Add Employment" />
+                      <div className="px-7 py-6 flex flex-col gap-6">
+                        {profile.candidate_details?.employments?.length > 0 ? (
+                          profile.candidate_details.employments.map((job, i) => (
+                            <div key={i} className="border-l-2 border-gray-100 pl-4">
+                              <div className="flex justify-between items-start">
+                                <h4 className="text-base font-bold text-gray-800">{job.job_title || "Job Title"}</h4>
+                                <span className="text-xs text-gray-400 bg-gray-50 px-2 py-0.5 rounded">
+                                  {job.joining_date && job.end_date ? `${job.joining_date} - ${job.end_date}` : "Duration"}
+                                </span>
+                              </div>
+                              <p className="text-sm font-medium mt-0.5" style={{ color: RED }}>{job.company_name || "Company Name"}</p>
+                            </div>
+                          ))
+                        ) : (
+                          <p className="text-sm text-gray-400 italic">No job experience entries tracked.</p>
+                        )}
+                      </div>
+                    </Card>
+                  </>
+                )}
+
+                {/* ── UPDATED ONLY: EMPLOYER CARD PROFILE ── */}
+                {role === "employer" && (
+                  <Card>
+                    <SectionHeader title="Corporate Entity Details" iconAction />
+                    <div className="px-7 py-5 flex flex-col gap-4 text-sm text-gray-700">
+                      <div className="flex justify-between items-center border-b pb-2" style={{ borderColor: PINK_BORDER }}>
+                        <span className="font-medium text-gray-500">Company Name</span>
+                        <span className="font-bold text-gray-900">{profile.employer_details?.company_name || "N/A"}</span>
+                      </div>
+                      <div className="flex justify-between items-center border-b pb-2" style={{ borderColor: PINK_BORDER }}>
+                        <span className="font-medium text-gray-500">GST Number</span>
+                        <span className="font-bold tracking-wider" style={{ color: RED }}>{profile.employer_details?.gst_number || "N/A"}</span>
+                      </div>
+                      <div className="flex justify-between items-center border-b pb-2" style={{ borderColor: PINK_BORDER }}>
+                        <span className="font-medium text-gray-500">PAN Number</span>
+                        <span className="font-bold text-gray-900 tracking-wider">{profile.employer_details?.pan_number || "N/A"}</span>
+                      </div>
+                      <div className="flex justify-between items-center border-b pb-2" style={{ borderColor: PINK_BORDER }}>
+                        <span className="font-medium text-gray-500">Work Email</span>
+                        <span className="font-medium text-gray-900 break-all">{profile.employer_details?.work_email || "N/A"}</span>
+                      </div>
+                      <div className="flex justify-between items-center border-b pb-2" style={{ borderColor: PINK_BORDER }}>
+                        <span className="font-medium text-gray-500">City / State Base</span>
+                        <span className="font-medium text-gray-900">{`${profile.employer_details?.city || "N/A"}, ${profile.employer_details?.state || "N/A"}`}</span>
+                      </div>
+                      <div className="flex justify-between items-center border-b pb-2" style={{ borderColor: PINK_BORDER }}>
+                        <span className="font-medium text-gray-500">Candidate Setup Done</span>
+                        <span className={`text-xs font-bold px-2 py-0.5 rounded ${profile.candidate_registration_done ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-600"}`}>
+                          {profile.candidate_registration_done ? "True" : "False"}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="font-medium text-gray-500">Recruiter Setup Done</span>
+                        <span className={`text-xs font-bold px-2 py-0.5 rounded ${profile.recruiter_registration_done ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-600"}`}>
+                          {profile.recruiter_registration_done ? "True" : "False"}
+                        </span>
+                      </div>
+                    </div>
+                  </Card>
+                )}
               </div>
-            </Card>
 
-          </div>
-
-          {/* ── RIGHT COLUMN ── */}
-          <div className="flex flex-col gap-5">
-
-            {/* About */}
-            <Card>
-              <SectionHeader title="About" iconAction />
-              <div className="px-7 py-6">
-                {profile.about.split("\n\n").map((para, i) => (
-                  <p key={i} className={`text-sm text-gray-600 leading-relaxed ${i > 0 ? "mt-4" : ""}`}>
-                    {para}
-                  </p>
-                ))}
+              <div className="flex flex-col gap-5">
+                {role === "candidate" && (
+                  <Card>
+                    <SectionHeader title="Key Skills" iconAction />
+                    <div className="px-7 py-6 flex flex-wrap gap-3">
+                      {profile.candidate_details?.skills?.length > 0 ? (
+                        profile.candidate_details.skills.map((skill, index) => (
+                          <span key={index} className="text-sm font-medium px-4 py-2 rounded-full border border-gray-200 bg-white text-gray-600 shadow-sm">
+                            {skill}
+                          </span>
+                        ))
+                      ) : (
+                        <p className="text-sm text-gray-400 italic">No structural skills listed.</p>
+                      )}
+                    </div>
+                  </Card>
+                )}
+                
+                {/* Fallback space block for symmetrical balancing if needed */}
+                {role === "employer" && (
+                  <Card>
+                    <SectionHeader title="System Operations Matrix" />
+                    <div className="px-7 py-5 text-sm text-gray-400 italic">
+                      Registered full corporate address context: {profile.employer_details?.address || "N/A"}
+                    </div>
+                  </Card>
+                )}
               </div>
-            </Card>
+            </>
+          )}
 
-            {/* Key Skills — moved to right column */}
-            <Card>
-              <SectionHeader title="Key Skills" iconAction />
-              <div className="px-7 py-6 flex flex-wrap gap-3">
-                {profile.skills.map((skill) => (
-                  <span
-                    key={skill}
-                    className="text-sm font-medium px-4 py-2 rounded-full border border-gray-200 bg-white text-gray-600 hover:border-red-200 hover:bg-red-50 transition-colors cursor-default"
-                  >
-                    {skill}
-                  </span>
-                ))}
-              </div>
-            </Card>
-
-          </div>
         </div>
       </div>
     </div>

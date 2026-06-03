@@ -51,7 +51,8 @@ const useResume = () => {
     return { month: "01", year: dateStr };
   };
 
-  const registerCandidate = async (formData, education, experience, resumeFile, resumeName) => {
+  // ✅ FIX: Destructured single object instead of separate arguments
+  const registerCandidate = async ({ formData, gender, skills, education, experience, resumeFile }) => {
     setSubmitLoading(true);
     setError(null);
     try {
@@ -61,35 +62,34 @@ const useResume = () => {
       }
 
       const payload = {
-        personal_details: {
-          name: formData.fullName,
-          email: formData.email,
-          phone: formData.phone,
-          dob: formData.dob,
-          gender: formData.gender || "Male",
-          preferred_location: formData.preferredLocation || "",
-          current_location: formData.currentLocation || "",
-        },
-        professional_details: {
-          total_experience: formData.totalExperience || "",
-          current_ctc: formData.currentCTC || "",
-          expected_ctc: formData.expectedCTC || "",
-          notice_period: formData.noticePeriod || "",
-          skills: formData.skills ? formData.skills.split(",").map(s => s.trim()) : [],
-        },
-        education_details: education.map((edu) => ({
-          degree: edu.degree,
-          field_of_study: edu.field,
-          college_or_university: edu.college,
-          passing_year: edu.year,
-          percentage_or_cgpa: edu.grade,
+        // ✅ Flat structure matching API expectation
+        name: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        dob: formData.dob,
+        gender: (gender || "Male").toLowerCase(),
+        preferred_location: formData.preferredLocation || "",
+        current_location: formData.currentLocation || "",
+        total_experience: parseFloat(formData.totalExperience) || 0,
+        current_ctc: parseFloat(formData.currentCTC) || 0,
+        expected_ctc: parseFloat(formData.expectedCTC) || 0,
+        notice_period_in_days: parseInt(formData.noticePeriod) || 0,
+        skills: skills ? skills.trim() : "",
+        education: education.map((edu) => ({
+          degree: edu.degree || "",
+          institute: edu.institute || "",
+          course: edu.course || "",
+          specialization: edu.specialization || "",
+          board: edu.board || "",
+          passing_year: edu.years || "",
+          course_type: (edu.type || "Full Time").toLowerCase().replace(" ", "_"),
         })),
-        experience_details: experience.map((exp) => {
-          const duration = exp.duration || "";
+        experience: experience.map((exp) => {
+          const duration = exp.period || "";
           const parts = duration.split("–").map(p => p.trim());
           const fromDate = parts[0] || "";
           const toDate = parts[1] || "";
-          const isCurrent = toDate.toLowerCase() === "present";
+          const isCurrent = toDate.toLowerCase() === "present" || toDate === "";
 
           const from = parseDate(fromDate);
           const to = parseDate(toDate);
@@ -104,8 +104,8 @@ const useResume = () => {
             skills_used: exp.skills,
           };
         }),
-        resume: resumeBase64,
-        resume_name: resumeName,
+        resume: resumeBase64 || "",
+        resume_name: resumeFile?.name || "",
       };
 
       const data = await registerCandidateService(payload);

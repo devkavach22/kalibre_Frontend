@@ -104,10 +104,12 @@ const router = createBrowserRouter([
     ],
   },
 
-  {
-    path: "/resume/upload",
-    element: <PublicRoute><ResumeUpload /></PublicRoute>,
-  },
+ {
+  path: "/resume/upload",
+  element: <ProtectedRouteAny><ResumeUpload /></ProtectedRouteAny>, // ✅ CORRECT
+},
+
+
   {
     path: "/candidates",
     element: <ProtectedRouteCandidate><CandidateDashbaord /></ProtectedRouteCandidate>,
@@ -137,7 +139,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/hr",
-    element: <PublicRoute><HrRegister /></PublicRoute>,
+    element: <ProtectedRouteAny><HrRegister /></ProtectedRouteAny>,
   },
 
   {

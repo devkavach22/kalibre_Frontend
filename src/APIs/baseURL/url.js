@@ -6,6 +6,7 @@ export const URLS = {
     LOGIN: `${BASE_URL}/auth/login`,
     FORGOT_PASSWORD: `${BASE_URL}/auth/forgot-password`,
     RESET_PASSWORD: `${BASE_URL}/auth/reset-password`,
+    PROFILE: `${BASE_URL}/auth/profile`, 
   },
   RESUME: {
     PARSE: `${BASE_URL}/candidate/parse_resume`,

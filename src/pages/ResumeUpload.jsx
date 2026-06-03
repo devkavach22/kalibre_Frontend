@@ -20,8 +20,8 @@ const CandidateRegistration = () => {
   const latestCvRef = useRef(null)
 
   const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
+    fullName: localStorage.getItem("user_name") || '',   // ✅ FIX: localStorage se
+    email: localStorage.getItem("email") || '',           // ✅ FIX: localStorage se
     phone: '',
     dob: '',
     preferredLocation: '',
@@ -40,7 +40,6 @@ const CandidateRegistration = () => {
   const [editingEdu, setEditingEdu] = useState(null)
   const [editingExp, setEditingExp] = useState(null)
 
-  // ✅ eduForm now includes course, specialization, board
   const [eduForm, setEduForm] = useState({
     degree: '', institute: '', years: '', type: 'Full Time', level: '',
     course: '', specialization: '', board: ''
@@ -72,8 +71,8 @@ const CandidateRegistration = () => {
     const p = data.parsed_data
 
     setFormData({
-      fullName: p.full_name || '',
-      email: p.contact_info?.email || '',
+      fullName: localStorage.getItem("user_name") || p.full_name || '',   // ✅ FIX: localStorage priority
+      email: localStorage.getItem("email") || p.contact_info?.email || '', // ✅ FIX: localStorage priority
       phone: p.contact_info?.phone || '',
       dob: p.date_of_birth || '',
       preferredLocation: p.preferred_city || p.preferred_work_locations?.[0] || '',
@@ -90,7 +89,6 @@ const CandidateRegistration = () => {
       setSkills(p.skills.hard_skills.join(', '))
     }
 
-    // ✅ Resume parser now maps course, specialization, board
     if (p.education?.length > 0) {
       setEducation(p.education.map((edu, i) => ({
         id: Date.now() + i,
@@ -131,14 +129,12 @@ const CandidateRegistration = () => {
 
   const openAddEdu = () => {
     setEditingEdu(null)
-    // ✅ Reset includes new fields
     setEduForm({ degree: '', institute: '', years: '', type: 'Full Time', level: '', course: '', specialization: '', board: '' })
     setShowEduModal(true)
   }
 
   const openEditEdu = (edu) => {
     setEditingEdu(edu.id)
-    // ✅ Edit pre-fills new fields
     setEduForm({
       degree: edu.degree, institute: edu.institute, years: edu.years,
       type: edu.type, level: edu.level,
@@ -187,11 +183,11 @@ const CandidateRegistration = () => {
       return
     }
     
-    // Custom hook hooks se token aur routing internally directly manage ho rahi hai
     await registerCandidate({ formData, gender, skills, education, experience, resumeFile })
   }
 
   const inputClass = "w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm text-[#333] placeholder-gray-400 outline-none focus:border-[#C8102E] focus:ring-1 focus:ring-[#C8102E]/20 transition-all duration-200 bg-white"
+  const inputDisabledClass = "w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm text-[#333] placeholder-gray-400 outline-none bg-gray-100 cursor-not-allowed"
   const labelClass = "block text-sm font-medium text-[#333] mb-1"
 
   return (
@@ -215,7 +211,6 @@ const CandidateRegistration = () => {
           </button>
         </div>
 
-        {/* Made flex layout adapt via direction swapping for layouts */}
         <div className="flex flex-col lg:flex-row gap-4 items-start">
           {/* Main Form */}
           <div className="w-full flex-1 min-w-0 flex flex-col gap-5">
@@ -263,7 +258,8 @@ const CandidateRegistration = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>Full Name <span className="text-[#C8102E]">*</span></label>
-                  <input type="text" name="fullName" value={formData.fullName} onChange={handleFormChange} placeholder="Enter your full name" className={inputClass} />
+                  {/* ✅ FIX: disabled */}
+                  <input type="text" name="fullName" value={formData.fullName} disabled className={inputDisabledClass} />
                 </div>
                 <div>
                   <label className={labelClass}>Email Address <span className="text-[#C8102E]">*</span></label>
@@ -271,7 +267,8 @@ const CandidateRegistration = () => {
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                     </span>
-                    <input type="email" name="email" value={formData.email} onChange={handleFormChange} placeholder="your.email@example.com" className={inputClass + " pl-9"} />
+                    {/* ✅ FIX: disabled */}
+                    <input type="email" name="email" value={formData.email} disabled className={inputDisabledClass + " pl-9"} />
                   </div>
                 </div>
                 <div>
@@ -392,7 +389,6 @@ const CandidateRegistration = () => {
                             </button>
                           </div>
                           <p className="text-[#555] text-xs mt-0.5 break-words">{edu.institute}</p>
-                          {/* ✅ Show new fields in card */}
                           {edu.course && <p className="text-[#666] text-xs mt-0.5 break-words">Course: {edu.course}</p>}
                           {edu.specialization && <p className="text-[#666] text-xs mt-0.5 break-words">Specialization: {edu.specialization}</p>}
                           {edu.board && <p className="text-[#666] text-xs mt-0.5 break-words">Board: {edu.board}</p>}
@@ -519,7 +515,7 @@ const CandidateRegistration = () => {
         </div>
       </div>
 
-      {/* Education Modal — ✅ with course, specialization, board fields (Scrollable max height added for small devices) */}
+      {/* Education Modal */}
       {showEduModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4 py-6">
           <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl flex flex-col max-h-full">
@@ -533,7 +529,6 @@ const CandidateRegistration = () => {
                 <label className={labelClass}>Institute</label>
                 <input className={inputClass} value={eduForm.institute} onChange={e => setEduForm({ ...eduForm, institute: e.target.value })} placeholder="Institute name, City" />
               </div>
-              {/* ✅ New fields */}
               <div>
                 <label className={labelClass}>Course</label>
                 <input className={inputClass} value={eduForm.course} onChange={e => setEduForm({ ...eduForm, course: e.target.value })} placeholder="e.g. Computer Science" />
@@ -573,7 +568,7 @@ const CandidateRegistration = () => {
         </div>
       )}
 
-      {/* Experience Modal (Scrollable max height added for small devices) */}
+      {/* Experience Modal */}
       {showExpModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4 py-6">
           <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl flex flex-col max-h-full">
