@@ -9,6 +9,9 @@ function DashboardNavbar() {
 
   const userName = localStorage.getItem('user_name') || 'User';
 
+  // Check if the current path is an admin route
+  const isAdminRoute = location.pathname.startsWith('/admin');
+
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user_name');
@@ -68,12 +71,15 @@ function DashboardNavbar() {
           <div className="flex items-center gap-3 sm:gap-4 ml-auto">
 
             <div className="hidden md:flex items-center gap-3">
-              <Link to="/profile" className="nav-profile-btn flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                My Profile
-              </Link>
+              {/* Profile button is only rendered if NOT on an admin route */}
+              {!isAdminRoute && (
+                <Link to="/profile" className="nav-profile-btn flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  My Profile
+                </Link>
+              )}
 
               <div className="user-name-badge flex items-center gap-2">
                 <span className="uppercase tracking-wide">{userName}</span>
@@ -110,16 +116,19 @@ function DashboardNavbar() {
               Logged in as: <span className="text-[#C8102E]">{userName}</span>
             </div>
             
-            <Link
-              to="/profile"
-              onClick={() => setMenuOpen(false)}
-              className="text-left text-sm font-semibold text-gray-700 flex items-center gap-2 py-2 transition-colors hover:text-[#C8102E]"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-              My Profile
-            </Link>
+            {/* Mobile Profile button is also conditionally hidden here */}
+            {!isAdminRoute && (
+              <Link
+                to="/profile"
+                onClick={() => setMenuOpen(false)}
+                className="text-left text-sm font-semibold text-gray-700 flex items-center gap-2 py-2 transition-colors hover:text-[#C8102E]"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                My Profile
+              </Link>
+            )}
 
             <button
               onClick={handleLogout}

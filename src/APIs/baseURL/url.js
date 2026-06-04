@@ -1,6 +1,9 @@
 const BASE_URL = "http://192.168.11.62:7788/api";
 
 export const URLS = {
+  ADMIN: {
+    GET_DASHBOARD: `${BASE_URL}/admin/dashboard/users`, 
+  },
   AUTH: {
     SIGNUP: `${BASE_URL}/auth/signup`,
     LOGIN: `${BASE_URL}/auth/login`,
