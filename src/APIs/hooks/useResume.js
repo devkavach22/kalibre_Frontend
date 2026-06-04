@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom"; 
 import toast from "react-hot-toast";
-import { parseResumeService, registerCandidateService, getPublishedJobsService } from "../services/resumeService";
+import { parseResumeService, registerCandidateService, getPublishedJobsService ,applyJobService} from "../services/resumeService";
 
 const useResume = () => {
   const navigate = useNavigate(); 
   const [loading, setLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
+    const [applyLoading, setApplyLoading] = useState(false);
   const [jobsLoading, setJobsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [resumeData, setResumeData] = useState(null);
@@ -51,7 +52,6 @@ const useResume = () => {
     return { month: "01", year: dateStr };
   };
 
-  // ✅ FIX: Destructured single object instead of separate arguments
   const registerCandidate = async ({ formData, gender, skills, education, experience, resumeFile }) => {
     setSubmitLoading(true);
     setError(null);
@@ -138,8 +138,24 @@ const useResume = () => {
       setJobsLoading(false);
     }
   };
+    const applyJob = async (payload) => {
+    setApplyLoading(true);
+    setError(null);
+    try {
+      const data = await applyJobService(payload);
+      toast.success("Application submitted successfully!");
+      return data;
+    } catch (err) {
+      setError(err.message);
+      toast.error(err.message || "Failed to submit application!");
+      return null;
+    } finally {
+      setApplyLoading(false);
+    }
+  };
 
-  return { parseResume, registerCandidate, getPublishedJobs, loading, submitLoading, jobsLoading, error, resumeData, jobs };
+
+  return { parseResume, registerCandidate, getPublishedJobs,applyJob, loading, submitLoading, jobsLoading, error, resumeData, jobs };
 };
 
 export default useResume;

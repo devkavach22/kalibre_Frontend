@@ -23,3 +23,10 @@ export const getPublishedJobsService = async () => {
     method: "GET",
   });
 };
+
+export const applyJobService = async (payload) => {
+  return apiClient(URLS.JOBS.APPLY, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+};

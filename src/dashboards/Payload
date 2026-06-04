@@ -51,3 +51,74 @@
 "company_phone": "+91 8899001122"
 }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+Job Apply Form 
+
+{
+
+  "job_id": 890,
+
+  "candidate_name": "Neha Sharma",
+
+  "email": "neha.sharma@example.com",
+
+  "contact_no": "9812233445",
+
+  "gender": "female",
+
+  "current_company": "Innovate Tech Labs",
+
+  "current_designation": "Senior UI Engineer",
+
+  "total_experience": 5.0,
+
+  "relevant_experience": 4.5,
+
+  "current_ctc": 11.2,
+
+  "expected_ctc": 16.5,
+
+  "notice_period": 15,
+
+  "specialization": "Computer Science & Engineering",
+
+  "remarks": "Strong profile with extensive React and Odoo frontend development experience.",
+
+  "resume_name": "neha_sharma_resume.pdf",
+
+  "resume": "",
+
+  "screening_answers": [
+
+    {
+
+      "question": "Are you comfortable working in Hybrid mode?",
+
+      "answer": "Yes, completely comfortable with hybrid work setup."
+
+    },
+
+    {
+
+      "question": "Do you have experience in Python and Odoo?",
+
+      "answer": "Yes, I have worked on Odoo JS framework (OWL) and custom backend modules."
+
+    }
+
+  ]
+
+}
+

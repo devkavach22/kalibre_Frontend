@@ -1,3 +1,4 @@
+/* eslint-disable no-empty */
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import DashboardNavbar from '../dashboards/DashboardNavbar';
@@ -37,8 +38,8 @@ function formatExperience(from, to) {
 function formatPostedDate(dateStr) {
   if (!dateStr) return '';
   const posted = new Date(dateStr);
-  const today  = new Date();
-  const days   = Math.floor((today - posted) / (1000 * 60 * 60 * 24));
+  const today = new Date();
+  const days = Math.floor((today - posted) / (1000 * 60 * 60 * 24));
   if (days === 0) return 'Today';
   if (days === 1) return '1 Day Ago';
   return `${days} Days Ago`;
@@ -47,7 +48,7 @@ function formatPostedDate(dateStr) {
 function normalizeJob(job, index) {
   if (!job) return null;
   const color = LOGO_COLORS[index % LOGO_COLORS.length];
-  
+
   const details = job.job_details || job || {};
   const descriptionObj = job.job_description || job || {};
   const preferences = job.candidate_preferences || job || {};
@@ -55,7 +56,7 @@ function normalizeJob(job, index) {
   const screening = job.screening_questions || job || {};
 
   const companyName = String(details.client_selection_name || details.client_selection || details.company || '').trim();
-  
+
   const locationStr = Array.isArray(details.location_names) && details.location_names.length > 0
     ? details.location_names.join(', ')
     : (details.location || details.job_location || '');
@@ -81,16 +82,16 @@ function normalizeJob(job, index) {
   }
 
   const perksMap = {
-    perk_health_insurance:      'Health Insurance',
-    perk_annual_bonus:          'Annual Bonus',
-    perk_provident_fund:        'Provident Fund',
-    perk_paid_leaves:           'Paid Leaves',
-    perk_flexible_working_hours:'Flexible Working Hours',
-    perk_work_from_home:        'Work From Home',
-    perk_cab_shuttle:           'Cab / Shuttle',
-    perk_food_allowance:        'Food Allowance',
+    perk_health_insurance: 'Health Insurance',
+    perk_annual_bonus: 'Annual Bonus',
+    perk_provident_fund: 'Provident Fund',
+    perk_paid_leaves: 'Paid Leaves',
+    perk_flexible_working_hours: 'Flexible Working Hours',
+    perk_work_from_home: 'Work From Home',
+    perk_cab_shuttle: 'Cab / Shuttle',
+    perk_food_allowance: 'Food Allowance',
   };
-  
+
   const rawPerks = job.perks || details.perks || {};
   const perksEnabled = Object.entries(rawPerks)
     .filter(([key, val]) => val === true && perksMap[key])
@@ -101,45 +102,45 @@ function normalizeJob(job, index) {
   }
 
   return {
-    id:               job.id || index + 1,
-    title:            details.name || details.title || 'Untitled',
-    company:          companyName,
-    logoLetter:       (companyName?.[0] || 'J').toUpperCase(),
-    logoColor:        color.bg,
-    logoTextColor:    color.text,
-    rating:           job.rating  || details.rating || 0,
-    reviews:          job.reviews || details.reviews || 0,
-    experience:       formatExperience(details.experience_from, details.experience_to),
-    salary:           formatSalary(details.budget_from, details.budget_to),
-    location:         locationStr,
-    description:      cleanDesc,
-    tags:             allSkills,
-    jobType:          details.job_type || details.jobType || 'Full Time',
-    postedAgo:        formatPostedDate(details.published_date || details.posted_date || details.create_date),
-    workMode:         details.work_mode || details.workMode || 'Work From Office',
-    dept:             deptStr,
-    openings:         details.number_of_openings || details.no_of_recruitment || 0,
+    id: job.id || index + 1,
+    title: details.name || details.title || 'Untitled',
+    company: companyName,
+    logoLetter: (companyName?.[0] || 'J').toUpperCase(),
+    logoColor: color.bg,
+    logoTextColor: color.text,
+    rating: job.rating || details.rating || 0,
+    reviews: job.reviews || details.reviews || 0,
+    experience: formatExperience(details.experience_from, details.experience_to),
+    salary: formatSalary(details.budget_from, details.budget_to),
+    location: locationStr,
+    description: cleanDesc,
+    tags: allSkills,
+    jobType: details.job_type || details.jobType || 'Full Time',
+    postedAgo: formatPostedDate(details.published_date || details.posted_date || details.create_date),
+    workMode: details.work_mode || details.workMode || 'Work From Office',
+    dept: deptStr,
+    openings: details.number_of_openings || details.no_of_recruitment || 0,
     highlights,
-    matchScore:       [],
-    keySkills:        allSkills,
-    about:            company.company_overview || '',
-    aboutTheRole:     descriptionObj.about_the_role || '',
+    matchScore: [],
+    keySkills: allSkills,
+    about: company.company_overview || '',
+    aboutTheRole: descriptionObj.about_the_role || '',
     requiredQualifications: preferences.required_qualifications || '',
-    certifications:   preferences.certifications || '',
-    companyTags:      [
-      ...(Array.isArray(details.industry_names)    ? details.industry_names    : []),
-      ...(Array.isArray(details.department_names)  ? details.department_names  : []),
+    certifications: preferences.certifications || '',
+    companyTags: [
+      ...(Array.isArray(details.industry_names) ? details.industry_names : []),
+      ...(Array.isArray(details.department_names) ? details.department_names : []),
     ].slice(0, 3),
     screeningQuestions: Array.isArray(screening.screening_questions) ? screening.screening_questions : [],
-    perks:            perksEnabled,
-    gender:           details.gender || '',
-    ageLimit:         details.age_limit || 0,
-    levelName:        details.level_name || '',
-    reportingTo:      details.reporting_to || '',
-    qualification:    preferences.qualification_name || preferences.required_qualifications || '',
-    specialization:   details.specialization_name || '',
-    status:           details.position_status || details.status || details.job_status || '',
-    language:         details.language || details.language_name || '',
+    perks: perksEnabled,
+    gender: details.gender || '',
+    ageLimit: details.age_limit || 0,
+    levelName: details.level_name || '',
+    reportingTo: details.reporting_to || '',
+    qualification: preferences.qualification_name || preferences.required_qualifications || '',
+    specialization: details.specialization_name || '',
+    status: details.position_status || details.status || details.job_status || '',
+    language: details.language || details.language_name || '',
   };
 }
 
@@ -179,11 +180,57 @@ function JobDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [followed, setFollowed] = useState(false);
-  const [saved, setSaved]       = useState(false);
-  const [applied, setApplied]   = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [applied, setApplied] = useState(() => {
+    try {
+      const appliedJobs = JSON.parse(localStorage.getItem('applied_jobs') || '[]');
+      return appliedJobs.includes(String(id));
+    } catch { return false; }
+  });
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { getPublishedJobs, jobs, jobsLoading } = useResume();
+  const [formData, setFormData] = useState(() => ({
+    name: localStorage.getItem('user_name') || '',
+    email: localStorage.getItem('email') || '',
+    mobile: '', location: '', designation: '',
+    expectedSalary: '', noticePeriod: '', experience: '',
+    gender: '', currentSalary: '', currentCompany: '', highestQualification: '',
+  }));
+  const [formErrors, setFormErrors] = useState({});
+  const [genderOpen, setGenderOpen] = useState(false);
+  const [resumeFile, setResumeFile] = useState(null);
+  const [screeningAnswers, setScreeningAnswers] = useState([]);
+  const [coverLetter, setCoverLetter] = useState('');
+  const [experienceOpen, setExperienceOpen] = useState(false);
+
+  const handleFieldChange = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    if (formErrors[field]) setFormErrors(prev => ({ ...prev, [field]: '' }));
+  };
+
+  const validateForm = () => {
+    const errors = {};
+    if (!formData.name.trim()) errors.name = 'Name is required';
+    else if (!/^[a-zA-Z\s]+$/.test(formData.name.trim())) errors.name = 'Name must contain only letters';
+    if (!formData.email.trim()) errors.email = 'Email is required';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) errors.email = 'Enter a valid email';
+    if (!formData.mobile.trim()) errors.mobile = 'Mobile number is required';
+    else if (!/^\d{10}$/.test(formData.mobile.trim())) errors.mobile = 'Enter a valid 10-digit mobile number';
+    if (!formData.location.trim()) errors.location = 'Location is required';
+    else if (!/^[a-zA-Z\s,]+$/.test(formData.location.trim())) errors.location = 'Location must contain only letters';
+    // designation, expectedSalary, noticePeriod, experience are optional — validate format only if filled
+    if (formData.designation.trim() && !/^[a-zA-Z\s]+$/.test(formData.designation.trim())) errors.designation = 'Designation must contain only letters';
+    if (formData.expectedSalary.trim() && !/^\d+(\.\d{1,2})?$/.test(formData.expectedSalary.trim())) errors.expectedSalary = 'Enter a valid number (e.g. 8 or 8.5)';
+    if (formData.noticePeriod.trim() && !/^[a-zA-Z0-9\s]+$/.test(formData.noticePeriod.trim())) errors.noticePeriod = 'Enter a valid notice period';
+    // gender, currentSalary, currentCompany, highestQualification are optional
+    if (formData.currentSalary.trim() && !/^\d+(\.\d{1,2})?$/.test(formData.currentSalary.trim())) errors.currentSalary = 'Enter a valid number (e.g. 6 or 6.5)';
+    if (formData.currentCompany.trim() && !/^[a-zA-Z0-9\s&.,()-]+$/.test(formData.currentCompany.trim())) errors.currentCompany = 'Enter a valid company name';
+    if (formData.highestQualification.trim() && !/^[a-zA-Z\s.()]+$/.test(formData.highestQualification.trim())) errors.highestQualification = 'Qualification must contain only letters';
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const { getPublishedJobs, applyJob, applyLoading, jobs, jobsLoading } = useResume();
 
   useEffect(() => {
     if (!jobs || jobs.length === 0) {
@@ -244,8 +291,8 @@ function JobDetailsPage() {
       <DashboardNavbar />
 
       <div className="px-4 sm:px-6 lg:px-10 py-5">
-        <button 
-          onClick={() => navigate('/candidates')} 
+        <button
+          onClick={() => navigate('/candidates')}
           className="flex items-center gap-2 text-[14px] font-bold text-white bg-[#C8102E] hover:bg-[#a30d25] active:scale-98 px-4 py-2 rounded-xl mb-4 shadow-sm transition-all duration-200 w-fit"
         >
           <svg className="w-4 h-4 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
@@ -299,7 +346,7 @@ function JobDetailsPage() {
                 {job.reportingTo && <span>Reports To: <span className="font-bold text-gray-700">{job.reportingTo}</span></span>}
                 {job.gender && job.gender !== 'any' && <span>Gender: <span className="font-bold text-gray-700 capitalize">{job.gender}</span></span>}
                 {job.ageLimit > 0 && <span>Age Limit: <span className="font-bold text-gray-700">{job.ageLimit} yrs</span></span>}
-                
+
                 {job.status && (
                   <span>Status: <span className="inline-flex items-center font-bold text-[11px] px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-100 capitalize animate-pulse">{job.status}</span></span>
                 )}
@@ -320,7 +367,7 @@ function JobDetailsPage() {
                   Cancel
                 </button>
                 <button
-                  onClick={() => { if (applied) { setApplied(false); } else { setIsModalOpen(true); } }}
+                  onClick={() => { if (!applied) { setIsModalOpen(true); } }}
                   className="px-10 py-3 rounded-xl text-sm font-bold text-white shadow-md hover:shadow-lg active:scale-98 transform transition-all duration-200 hover:opacity-95"
                   style={{ background: applied ? '#059669' : 'linear-gradient(92.62deg,#FA2329 0.91%,#B10D1C 99.09%)' }}
                 >
@@ -402,9 +449,9 @@ function JobDetailsPage() {
               <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-xs hover:shadow-md transition-shadow duration-300">
                 <h2 className="text-base font-extrabold text-[#111111] mb-3.5 border-b border-gray-50 pb-2">Qualifications & Certifications</h2>
                 <div className="flex flex-col gap-2.5 text-[14px] text-gray-600 font-medium">
-                  {job.qualification    && <p><span className="font-bold text-gray-800">Qualification:</span> {job.qualification}</p>}
-                  {job.specialization   && <p><span className="font-bold text-gray-800">Specialization:</span> {job.specialization}</p>}
-                  {job.certifications   && <p><span className="font-bold text-gray-800">Certifications:</span> {job.certifications}</p>}
+                  {job.qualification && <p><span className="font-bold text-gray-800">Qualification:</span> {job.qualification}</p>}
+                  {job.specialization && <p><span className="font-bold text-gray-800">Specialization:</span> {job.specialization}</p>}
+                  {job.certifications && <p><span className="font-bold text-gray-800">Certifications:</span> {job.certifications}</p>}
                   {job.requiredQualifications && <p className="leading-relaxed border-t border-gray-50 pt-2 mt-1">{job.requiredQualifications}</p>}
                 </div>
               </div>
@@ -497,41 +544,121 @@ function JobDetailsPage() {
                 <h2 className="text-xl font-extrabold text-[#B10D1C] leading-snug">Apply for {cleanTitle}</h2>
                 <p className="text-[13px] font-medium text-gray-500 mt-1">Please fill in the details below to apply for this position.</p>
               </div>
-              <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600 p-2 rounded-lg hover:bg-gray-50 active:scale-95 transition-all">
+              <button onClick={() => { setIsModalOpen(false); setFormErrors({}); }} className="text-gray-400 hover:text-gray-600 p-2 rounded-lg hover:bg-gray-50 active:scale-95 transition-all">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
-              {[
-                { label: 'Name', type: 'text', placeholder: 'Enter your full name' },
-                { label: 'Email Address', type: 'email', placeholder: 'Enter your email address' },
-                { label: 'Mobile Number', type: 'text', placeholder: 'Enter your mobile number' },
-                { label: 'Current Location', type: 'text', placeholder: 'Enter your current location' },
-                { label: 'Current Designation', type: 'text', placeholder: 'Enter your current designation' },
-                { label: 'Expected Salary (in LPA)', type: 'text', placeholder: 'Enter your expected salary' },
-                { label: 'Notice Period', type: 'text', placeholder: 'Enter your notice period' },
-              ].map(({ label, type, placeholder }) => (
-                <div key={label}>
-                  <label className="block text-[13px] font-bold text-gray-700 mb-1.5">{label} <span className="text-red-500">*</span></label>
-                  <input type={type} placeholder={placeholder} className="w-full border border-gray-200 rounded-xl p-3 text-[13px] font-medium placeholder-gray-400 focus:outline-none focus:border-[#B10D1C] focus:ring-1 focus:ring-[#B10D1C] transition-all bg-gray-50/30" />
-                </div>
-              ))}
+
+              {/* Name */}
               <div>
-                <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Experience (in years) <span className="text-red-500">*</span></label>
-                <div className="relative">
-                  <select className="w-full border border-gray-200 rounded-xl p-3 text-[13px] font-medium text-black bg-gray-50/30 appearance-none focus:outline-none focus:border-[#B10D1C] focus:ring-1 focus:ring-[#B10D1C] transition-all">
-                    <option>Select experience</option>
-                    <option>0 - 1 Years</option>
-                    <option>1 - 3 Years</option>
-                    <option>3 - 5 Years</option>
-                    <option>5+ Years</option>
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
-                    <svg className="fill-current h-4 w-4" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                  </div>
-                </div>
+                <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Name <span className="text-red-500">*</span> <span className="text-gray-400 text-[10px] font-normal"></span></label>
+                <input type="text" placeholder="Enter your full name" value={formData.name} disabled className="w-full border border-gray-200 rounded-xl p-3 text-[13px] font-medium bg-gray-100 text-gray-500 cursor-not-allowed outline-none" />
+                {formErrors.name && <p className="text-[11px] text-red-500 mt-1 font-medium">{formErrors.name}</p>}
               </div>
+
+              {/* Email */}
+              <div>
+                <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Email Address <span className="text-red-500">*</span> <span className="text-gray-400 text-[10px] font-normal"></span></label>
+                <input type="email" placeholder="Enter your email address" value={formData.email} disabled className="w-full border border-gray-200 rounded-xl p-3 text-[13px] font-medium bg-gray-100 text-gray-500 cursor-not-allowed outline-none" />
+                {formErrors.email && <p className="text-[11px] text-red-500 mt-1 font-medium">{formErrors.email}</p>}
+              </div>
+
+              {/* Mobile */}
+              <div>
+                <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Mobile Number <span className="text-red-500">*</span></label>
+                <input type="text" placeholder="Enter your mobile number" value={formData.mobile} maxLength={10} onChange={e => { if (/^\d*$/.test(e.target.value)) handleFieldChange('mobile', e.target.value); }} className={`w-full border rounded-xl p-3 text-[13px] font-medium placeholder-gray-400 focus:outline-none focus:ring-1 transition-all bg-gray-50/30 ${formErrors.mobile ? 'border-red-400 focus:border-red-400 focus:ring-red-400' : 'border-gray-200 focus:border-[#B10D1C] focus:ring-[#B10D1C]'}`} />
+                {formErrors.mobile && <p className="text-[11px] text-red-500 mt-1 font-medium">{formErrors.mobile}</p>}
+              </div>
+
+              {/* Current Location */}
+              <div>
+                <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Current Location <span className="text-red-500">*</span></label>
+                <input type="text" placeholder="Enter your current location" value={formData.location} onChange={e => { if (/^[a-zA-Z\s,]*$/.test(e.target.value)) handleFieldChange('location', e.target.value); }} className={`w-full border rounded-xl p-3 text-[13px] font-medium placeholder-gray-400 focus:outline-none focus:ring-1 transition-all bg-gray-50/30 ${formErrors.location ? 'border-red-400 focus:border-red-400 focus:ring-red-400' : 'border-gray-200 focus:border-[#B10D1C] focus:ring-[#B10D1C]'}`} />
+                {formErrors.location && <p className="text-[11px] text-red-500 mt-1 font-medium">{formErrors.location}</p>}
+              </div>
+
+              {/* Current Designation */}
+              <div>
+                <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Current Designation <span className="text-gray-400 font-normal text-[11px]"></span></label>
+                <input type="text" placeholder="Enter your current designation" value={formData.designation} onChange={e => { if (/^[a-zA-Z\s]*$/.test(e.target.value)) handleFieldChange('designation', e.target.value); }} className={`w-full border rounded-xl p-3 text-[13px] font-medium placeholder-gray-400 focus:outline-none focus:ring-1 transition-all bg-gray-50/30 ${formErrors.designation ? 'border-red-400 focus:border-red-400 focus:ring-red-400' : 'border-gray-200 focus:border-[#B10D1C] focus:ring-[#B10D1C]'}`} />
+                {formErrors.designation && <p className="text-[11px] text-red-500 mt-1 font-medium">{formErrors.designation}</p>}
+              </div>
+
+              {/* Expected Salary */}
+              <div>
+                <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Expected Salary (in LPA) <span className="text-gray-400 font-normal text-[11px]"></span></label>
+                <input type="text" placeholder="Enter your expected salary" value={formData.expectedSalary} onChange={e => { if (/^\d*\.?\d{0,2}$/.test(e.target.value)) handleFieldChange('expectedSalary', e.target.value); }} className={`w-full border rounded-xl p-3 text-[13px] font-medium placeholder-gray-400 focus:outline-none focus:ring-1 transition-all bg-gray-50/30 ${formErrors.expectedSalary ? 'border-red-400 focus:border-red-400 focus:ring-red-400' : 'border-gray-200 focus:border-[#B10D1C] focus:ring-[#B10D1C]'}`} />
+                {formErrors.expectedSalary && <p className="text-[11px] text-red-500 mt-1 font-medium">{formErrors.expectedSalary}</p>}
+              </div>
+
+              {/* Notice Period */}
+              <div>
+                <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Notice Period <span className="text-gray-400 font-normal text-[11px]"></span></label>
+                <input type="text" placeholder="e.g. 30 days, Immediate" value={formData.noticePeriod} onChange={e => { if (/^[a-zA-Z0-9\s]*$/.test(e.target.value)) handleFieldChange('noticePeriod', e.target.value); }} className={`w-full border rounded-xl p-3 text-[13px] font-medium placeholder-gray-400 focus:outline-none focus:ring-1 transition-all bg-gray-50/30 ${formErrors.noticePeriod ? 'border-red-400 focus:border-red-400 focus:ring-red-400' : 'border-gray-200 focus:border-[#B10D1C] focus:ring-[#B10D1C]'}`} />
+                {formErrors.noticePeriod && <p className="text-[11px] text-red-500 mt-1 font-medium">{formErrors.noticePeriod}</p>}
+              </div>
+
+              {/* Experience */}
+              <div className="relative">
+                <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Experience (in years) <span className="text-gray-400 font-normal text-[11px]"></span></label>
+                <button type="button" onClick={() => setExperienceOpen(o => !o)} className="w-full border border-gray-200 rounded-xl px-3 py-3 text-[13px] font-medium text-left flex items-center justify-between bg-gray-50/30 hover:border-[#B10D1C] focus:outline-none focus:border-[#B10D1C] focus:ring-1 focus:ring-[#B10D1C] transition-all">
+                  <span className={formData.experience ? 'text-gray-800' : 'text-gray-400'}>{formData.experience || 'Select experience'}</span>
+                  <svg className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${experienceOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                </button>
+                {experienceOpen && (
+                  <div className="absolute z-50 mt-1.5 w-full bg-white border border-gray-100 rounded-xl shadow-lg overflow-hidden">
+                    {['0 - 1 Years', '1 - 3 Years', '3 - 5 Years', '5+ Years'].map(opt => (
+                      <button key={opt} type="button" onClick={() => { handleFieldChange('experience', opt); setExperienceOpen(false); }}
+                        className={`w-full text-left px-4 py-2.5 text-[13px] font-medium transition-colors hover:bg-red-50 hover:text-[#B10D1C] ${formData.experience === opt ? 'bg-red-50 text-[#B10D1C] font-bold' : 'text-gray-700'}`}>
+                        {opt}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Gender */}
+              <div className="relative">
+                <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Gender <span className="text-gray-400 font-normal text-[11px]"></span></label>
+                <button type="button" onClick={() => setGenderOpen(o => !o)} className="w-full border border-gray-200 rounded-xl px-3 py-3 text-[13px] font-medium text-left flex items-center justify-between bg-gray-50/30 hover:border-[#B10D1C] focus:outline-none focus:border-[#B10D1C] focus:ring-1 focus:ring-[#B10D1C] transition-all">
+                  <span className={formData.gender ? 'text-gray-800' : 'text-gray-400'}>{formData.gender || 'Select gender'}</span>
+                  <svg className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${genderOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                </button>
+                {genderOpen && (
+                  <div className="absolute z-50 mt-1.5 w-full bg-white border border-gray-100 rounded-xl shadow-lg overflow-hidden">
+                    {['Male', 'Female', 'Other', 'Prefer not to say'].map(opt => (
+                      <button key={opt} type="button" onClick={() => { handleFieldChange('gender', opt); setGenderOpen(false); }}
+                        className={`w-full text-left px-4 py-2.5 text-[13px] font-medium transition-colors hover:bg-red-50 hover:text-[#B10D1C] ${formData.gender === opt ? 'bg-red-50 text-[#B10D1C] font-bold' : 'text-gray-700'}`}>
+                        {opt}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Current Salary */}
+              <div>
+                <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Current Salary (in LPA) <span className="text-gray-400 font-normal text-[11px]"></span></label>
+                <input type="text" placeholder="Enter your current salary" value={formData.currentSalary} onChange={e => { if (/^\d*\.?\d{0,2}$/.test(e.target.value)) handleFieldChange('currentSalary', e.target.value); }} className={`w-full border rounded-xl p-3 text-[13px] font-medium placeholder-gray-400 focus:outline-none focus:ring-1 transition-all bg-gray-50/30 ${formErrors.currentSalary ? 'border-red-400 focus:border-red-400 focus:ring-red-400' : 'border-gray-200 focus:border-[#B10D1C] focus:ring-[#B10D1C]'}`} />
+                {formErrors.currentSalary && <p className="text-[11px] text-red-500 mt-1 font-medium">{formErrors.currentSalary}</p>}
+              </div>
+
+              {/* Current Company */}
+              <div>
+                <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Current Company <span className="text-gray-400 font-normal text-[11px]"></span></label>
+                <input type="text" placeholder="Enter your current company name" value={formData.currentCompany} onChange={e => { if (/^[a-zA-Z0-9\s&.,()-]*$/.test(e.target.value)) handleFieldChange('currentCompany', e.target.value); }} className={`w-full border rounded-xl p-3 text-[13px] font-medium placeholder-gray-400 focus:outline-none focus:ring-1 transition-all bg-gray-50/30 ${formErrors.currentCompany ? 'border-red-400 focus:border-red-400 focus:ring-red-400' : 'border-gray-200 focus:border-[#B10D1C] focus:ring-[#B10D1C]'}`} />
+                {formErrors.currentCompany && <p className="text-[11px] text-red-500 mt-1 font-medium">{formErrors.currentCompany}</p>}
+              </div>
+
+              {/* Highest Qualification */}
+              <div>
+                <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Highest Qualification <span className="text-gray-400 font-normal text-[11px]"></span></label>
+                <input type="text" placeholder="e.g. B.Tech, MBA, M.Sc" value={formData.highestQualification} onChange={e => { if (/^[a-zA-Z\s.()]*$/.test(e.target.value)) handleFieldChange('highestQualification', e.target.value); }} className={`w-full border rounded-xl p-3 text-[13px] font-medium placeholder-gray-400 focus:outline-none focus:ring-1 transition-all bg-gray-50/30 ${formErrors.highestQualification ? 'border-red-400 focus:border-red-400 focus:ring-red-400' : 'border-gray-200 focus:border-[#B10D1C] focus:ring-[#B10D1C]'}`} />
+                {formErrors.highestQualification && <p className="text-[11px] text-red-500 mt-1 font-medium">{formErrors.highestQualification}</p>}
+              </div>
+
             </div>
 
             {/* Screening Questions in modal if any */}
@@ -542,26 +669,33 @@ function JobDetailsPage() {
                   {job.screeningQuestions.map((q, i) => (
                     <div key={i} className="bg-gray-50/50 p-4 rounded-xl border border-gray-100">
                       <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Q{i + 1}. {q}</label>
-                      <input type="text" placeholder="Your answer..." className="w-full border border-gray-200 rounded-xl p-3 text-[13px] font-medium placeholder-gray-400 focus:outline-none focus:border-[#B10D1C] focus:ring-1 focus:ring-[#B10D1C] transition-all bg-white" />
+                      <input type="text" placeholder="Your answer..."
+                        onChange={e => {
+                          const updated = [...screeningAnswers];
+                          updated[i] = { question: q, answer: e.target.value };
+                          setScreeningAnswers(updated);
+                        }}
+                        className="w-full border border-gray-200 rounded-xl p-3 text-[13px] font-medium placeholder-gray-400 focus:outline-none focus:border-[#B10D1C] focus:ring-1 focus:ring-[#B10D1C] transition-all bg-white" />
                     </div>
                   ))}
                 </div>
               </div>
             )}
 
-            <div className="border-2 border-dashed border-red-200 rounded-xl p-6 bg-[#FFF5F5]/20 text-center cursor-pointer hover:bg-[#FFF5F5]/40 transition-all duration-200 group active:scale-99">
+            <label className="border-2 border-dashed border-red-200 rounded-xl p-6 bg-[#FFF5F5]/20 text-center cursor-pointer hover:bg-[#FFF5F5]/40 transition-all duration-200 group active:scale-99 block">
+              <input type="file" accept=".pdf,.doc,.docx" className="hidden" onChange={e => setResumeFile(e.target.files[0] || null)} />
               <div className="flex flex-col items-center gap-1.5">
                 <svg className="w-8 h-8 text-[#FA2329] transform transition-transform group-hover:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                 </svg>
-                <span className="text-[14px] font-extrabold text-[#FA2329]">Upload Resume</span>
-                <span className="text-[11px] text-gray-400 font-semibold">Upload your resume to auto-fill all profile details.</span>
+                <span className="text-[14px] font-extrabold text-[#FA2329]">{resumeFile ? resumeFile.name : 'Upload Resume'}</span>
+                <span className="text-[11px] text-gray-400 font-semibold">{resumeFile ? 'Click to change file' : 'PDF, DOC, DOCX supported'}</span>
               </div>
-            </div>
+            </label>
 
             <div className="text-left">
-              <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Cover Letter (Optional)</label>
-              <textarea rows={3} placeholder="Write a brief note about yourself and your interest in this role..." className="w-full border border-gray-200 rounded-xl p-3 text-[13px] font-medium placeholder-gray-400 focus:outline-none focus:border-[#B10D1C] focus:ring-1 focus:ring-[#B10D1C] transition-all bg-gray-50/30 resize-none"></textarea>
+              <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Cover Letter </label>
+              <textarea rows={3} placeholder="Write a brief note about yourself and your interest in this role..." value={coverLetter} onChange={e => setCoverLetter(e.target.value)} className="w-full border border-gray-200 rounded-xl p-3 text-[13px] font-medium placeholder-gray-400 focus:outline-none focus:border-[#B10D1C] focus:ring-1 focus:ring-[#B10D1C] transition-all bg-gray-50/30 resize-none"></textarea>
             </div>
 
             <div className="flex items-center gap-2.5 text-left bg-gray-50/50 p-3 rounded-xl border border-gray-100">
@@ -572,11 +706,62 @@ function JobDetailsPage() {
             </div>
 
             <div className="flex justify-end gap-3 mt-1 pt-4 border-t border-gray-100">
-              <button onClick={() => setIsModalOpen(false)} className="px-6 py-2.5 rounded-xl text-xs font-bold border border-[#C8102E] text-[#C8102E] hover:bg-red-50/50 active:scale-98 transition-all">
+              <button onClick={() => { setIsModalOpen(false); setFormErrors({}); }} className="px-6 py-2.5 rounded-xl text-xs font-bold border border-[#C8102E] text-[#C8102E] hover:bg-red-50/50 active:scale-98 transition-all">
                 Cancel
               </button>
               <button
-                onClick={() => { setApplied(true); setIsModalOpen(false); }}
+                disabled={applyLoading}
+                onClick={async () => {
+                  if (!validateForm()) return;
+                  // parse experience string to number e.g. "1 - 3 Years" → 2
+                  const expMap = { '0 - 1 Years': 0.5, '1 - 3 Years': 2, '3 - 5 Years': 4, '5+ Years': 6 };
+
+                  let resumeBase64 = '';
+                  let resumeName = '';
+                  if (resumeFile) {
+                    resumeBase64 = await new Promise((res, rej) => {
+                      const r = new FileReader();
+                      r.readAsDataURL(resumeFile);
+                      r.onload = () => res(r.result.split(',')[1]);
+                      r.onerror = rej;
+                    });
+                    resumeName = resumeFile.name;
+                  }
+
+                  const payload = {
+                    job_id: Number(id),
+                    candidate_name: formData.name,
+                    email: formData.email,
+                    contact_no: formData.mobile,
+                    gender: (formData.gender || '').toLowerCase(),
+                    current_company: formData.currentCompany,
+                    current_designation: formData.designation,
+                    total_experience: expMap[formData.experience] ?? 0,
+                    relevant_experience: expMap[formData.experience] ?? 0,
+                    current_ctc: parseFloat(formData.currentSalary) || 0,
+                    expected_ctc: parseFloat(formData.expectedSalary) || 0,
+                    notice_period: parseInt(formData.noticePeriod) || 0,
+
+
+                    course: formData.highestQualification,
+
+                    applicant_notes: coverLetter,
+                    resume_name: resumeName,
+                    resume: resumeBase64,
+                    screening_answers: screeningAnswers,
+                  };
+
+                  const result = await applyJob(payload);
+                  if (result) {
+                    try {
+                      const appliedJobs = JSON.parse(localStorage.getItem('applied_jobs') || '[]');
+                      if (!appliedJobs.includes(String(id))) appliedJobs.push(String(id));
+                      localStorage.setItem('applied_jobs', JSON.stringify(appliedJobs));
+                    } catch { }
+                    setApplied(true);
+                    setIsModalOpen(false);
+                  }
+                }}
                 className="px-6 py-2.5 rounded-xl text-xs font-bold text-white bg-[#B10D1C] hover:bg-[#960b17] active:scale-98 transition-all shadow-sm"
               >
                 Save Details
