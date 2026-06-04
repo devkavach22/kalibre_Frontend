@@ -339,7 +339,7 @@ function JobDetailsPage() {
 
               <hr className="my-3 border-gray-100" />
 
-              <div className="flex flex-wrap gap-x-6 gap-y-2 text-[13px] font-medium text-gray-500">
+              <div className="flex flex-col sm:flex-row sm:flex-wrap gap-x-6 gap-y-2 text-[13px] font-medium text-gray-500">
                 <span>Posted: <span className="font-bold text-gray-700">{job.postedAgo}</span></span>
                 <span>Openings: <span className="font-bold text-gray-700">{job.openings}</span></span>
                 {job.levelName && <span>Level: <span className="font-bold text-gray-700">{job.levelName}</span></span>}
@@ -362,18 +362,18 @@ function JobDetailsPage() {
                 </label>
               </div>
 
-              <div className="flex items-center gap-3 mt-5">
-                <button onClick={() => navigate('/candidates')} className="px-6 py-3 rounded-xl text-sm font-bold border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-800 active:scale-98 transition-all duration-200">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mt-5">
+                <button onClick={() => navigate('/candidates')} className="w-full sm:w-auto px-6 py-3 rounded-xl text-sm font-bold border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-800 active:scale-98 transition-all duration-200">
                   Cancel
                 </button>
                 <button
                   onClick={() => { if (!applied) { setIsModalOpen(true); } }}
-                  className="px-10 py-3 rounded-xl text-sm font-bold text-white shadow-md hover:shadow-lg active:scale-98 transform transition-all duration-200 hover:opacity-95"
+                  className="w-full sm:w-auto px-10 py-3 rounded-xl text-sm font-bold text-white shadow-md hover:shadow-lg active:scale-98 transform transition-all duration-200 hover:opacity-95"
                   style={{ background: applied ? '#059669' : 'linear-gradient(92.62deg,#FA2329 0.91%,#B10D1C 99.09%)' }}
                 >
                   {applied ? '✓ Applied' : 'Apply Now'}
                 </button>
-                <button onClick={() => setSaved(!saved)} className="p-3 rounded-xl border border-gray-200 hover:bg-red-50/30 active:scale-95 transition-all duration-200 group">
+                <button onClick={() => setSaved(!saved)} className="w-full sm:w-auto p-3 rounded-xl border border-gray-200 hover:bg-red-50/30 active:scale-95 transition-all duration-200 group flex items-center justify-center">
                   <svg className="w-4.5 h-4.5 transform transition-transform group-hover:scale-110" fill={saved ? '#C8102E' : 'none'} viewBox="0 0 24 24" stroke={saved ? '#C8102E' : '#9ca3af'} strokeWidth={2.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                   </svg>
