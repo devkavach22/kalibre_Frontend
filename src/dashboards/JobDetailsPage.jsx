@@ -20,7 +20,6 @@ function stripHtml(html) {
   return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
-// Format logic for job structures
 function formatSalary(from, to) {
   if (!from && !to) return 'Not Disclosed';
   if (from && to) return `${from} - ${to} LPA`;
@@ -218,11 +217,9 @@ function JobDetailsPage() {
     else if (!/^\d{10}$/.test(formData.mobile.trim())) errors.mobile = 'Enter a valid 10-digit mobile number';
     if (!formData.location.trim()) errors.location = 'Location is required';
     else if (!/^[a-zA-Z\s,]+$/.test(formData.location.trim())) errors.location = 'Location must contain only letters';
-    // designation, expectedSalary, noticePeriod, experience are optional — validate format only if filled
     if (formData.designation.trim() && !/^[a-zA-Z\s]+$/.test(formData.designation.trim())) errors.designation = 'Designation must contain only letters';
     if (formData.expectedSalary.trim() && !/^\d+(\.\d{1,2})?$/.test(formData.expectedSalary.trim())) errors.expectedSalary = 'Enter a valid number (e.g. 8 or 8.5)';
     if (formData.noticePeriod.trim() && !/^[a-zA-Z0-9\s]+$/.test(formData.noticePeriod.trim())) errors.noticePeriod = 'Enter a valid notice period';
-    // gender, currentSalary, currentCompany, highestQualification are optional
     if (formData.currentSalary.trim() && !/^\d+(\.\d{1,2})?$/.test(formData.currentSalary.trim())) errors.currentSalary = 'Enter a valid number (e.g. 6 or 6.5)';
     if (formData.currentCompany.trim() && !/^[a-zA-Z0-9\s&.,()-]+$/.test(formData.currentCompany.trim())) errors.currentCompany = 'Enter a valid company name';
     if (formData.highestQualification.trim() && !/^[a-zA-Z\s.()]+$/.test(formData.highestQualification.trim())) errors.highestQualification = 'Qualification must contain only letters';
@@ -346,7 +343,6 @@ function JobDetailsPage() {
                 {job.reportingTo && <span>Reports To: <span className="font-bold text-gray-700">{job.reportingTo}</span></span>}
                 {job.gender && job.gender !== 'any' && <span>Gender: <span className="font-bold text-gray-700 capitalize">{job.gender}</span></span>}
                 {job.ageLimit > 0 && <span>Age Limit: <span className="font-bold text-gray-700">{job.ageLimit} yrs</span></span>}
-
                 {job.status && (
                   <span>Status: <span className="inline-flex items-center font-bold text-[11px] px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-100 capitalize animate-pulse">{job.status}</span></span>
                 )}
@@ -485,28 +481,38 @@ function JobDetailsPage() {
             {/* ── About Company ── */}
             <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-xs hover:shadow-md transition-shadow duration-300">
               <h2 className="text-base font-extrabold text-[#111111] mb-4 border-b border-gray-50 pb-2">About The Company</h2>
-              <div className="flex items-start gap-4 mb-4 flex-wrap sm:flex-nowrap">
-                <div className="w-14 h-14 rounded-xl flex items-center justify-center font-bold text-base flex-shrink-0 border border-gray-100 shadow-inner" style={{ background: job.logoColor, color: job.logoTextColor }}>
+
+              {/* ✅ FIX: Row 1 — Logo + Company Name */}
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center font-bold text-base flex-shrink-0 border border-gray-100 shadow-inner" style={{ background: job.logoColor, color: job.logoTextColor }}>
                   {job.logoLetter}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[15px] font-bold text-[#111111]">{job.company}</p>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {job.companyTags.map((tag) => (
-                      <span key={tag} className="text-[12px] font-medium px-3 py-0.5 rounded-full border border-gray-200 bg-gray-50/50 text-gray-500">{tag}</span>
-                    ))}
-                  </div>
+                <p className="text-[15px] font-bold text-[#111111] leading-snug">{job.company}</p>
+              </div>
+
+              {/* ✅ FIX: Row 2 — Tags */}
+              {job.companyTags.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {job.companyTags.map((tag) => (
+                    <span key={tag} className="text-[12px] font-medium px-3 py-0.5 rounded-full border border-gray-200 bg-gray-50/50 text-gray-500">{tag}</span>
+                  ))}
                 </div>
+              )}
+
+              {/* ✅ FIX: Row 3 — Follow button full width on mobile, auto on desktop */}
+              <div className="mb-4">
                 <button
                   onClick={() => setFollowed(!followed)}
-                  className="flex-shrink-0 flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-xs font-bold text-white shadow-xs hover:shadow-md active:scale-98 transition-all duration-200"
+                  className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-xl text-xs font-bold text-white shadow-xs hover:shadow-md active:scale-98 transition-all duration-200"
                   style={{ background: followed ? '#059669' : 'linear-gradient(92.62deg,#FA2329 0.91%,#B10D1C 99.09%)' }}
                 >
                   {followed ? '✓ Following' : '+ Follow'}
                 </button>
               </div>
+
+              {/* ✅ FIX: Row 4 — Overview */}
               {job.about && (
-                <div className="mt-3 bg-gray-50/30 p-4 rounded-xl border border-gray-50">
+                <div className="bg-gray-50/30 p-4 rounded-xl border border-gray-50">
                   <h3 className="text-[13px] font-extrabold text-[#111111] mb-2 uppercase tracking-wider">Overview</h3>
                   <p className="text-[14px] text-gray-600 leading-relaxed font-medium">{job.about}</p>
                 </div>
@@ -536,7 +542,6 @@ function JobDetailsPage() {
       {/* ── Apply Modal ── */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-xs transition-opacity duration-300 overflow-y-auto">
-          {/* Increased input element & structural font sizing below */}
           <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[88vh] overflow-y-auto p-8 relative shadow-2xl flex flex-col gap-5 my-6 animate-in fade-in zoom-in-95 duration-200 text-left [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
 
             <div className="flex justify-between items-start border-b border-gray-100 pb-4">
@@ -551,58 +556,50 @@ function JobDetailsPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
 
-              {/* Name */}
               <div>
-                <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Name <span className="text-red-500">*</span> <span className="text-gray-400 text-[10px] font-normal"></span></label>
+                <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Name <span className="text-red-500">*</span></label>
                 <input type="text" placeholder="Enter your full name" value={formData.name} disabled className="w-full border border-gray-200 rounded-xl p-3 text-[13px] font-medium bg-gray-100 text-gray-500 cursor-not-allowed outline-none" />
                 {formErrors.name && <p className="text-[11px] text-red-500 mt-1 font-medium">{formErrors.name}</p>}
               </div>
 
-              {/* Email */}
               <div>
-                <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Email Address <span className="text-red-500">*</span> <span className="text-gray-400 text-[10px] font-normal"></span></label>
+                <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Email Address <span className="text-red-500">*</span></label>
                 <input type="email" placeholder="Enter your email address" value={formData.email} disabled className="w-full border border-gray-200 rounded-xl p-3 text-[13px] font-medium bg-gray-100 text-gray-500 cursor-not-allowed outline-none" />
                 {formErrors.email && <p className="text-[11px] text-red-500 mt-1 font-medium">{formErrors.email}</p>}
               </div>
 
-              {/* Mobile */}
               <div>
                 <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Mobile Number <span className="text-red-500">*</span></label>
                 <input type="text" placeholder="Enter your mobile number" value={formData.mobile} maxLength={10} onChange={e => { if (/^\d*$/.test(e.target.value)) handleFieldChange('mobile', e.target.value); }} className={`w-full border rounded-xl p-3 text-[13px] font-medium placeholder-gray-400 focus:outline-none focus:ring-1 transition-all bg-gray-50/30 ${formErrors.mobile ? 'border-red-400 focus:border-red-400 focus:ring-red-400' : 'border-gray-200 focus:border-[#B10D1C] focus:ring-[#B10D1C]'}`} />
                 {formErrors.mobile && <p className="text-[11px] text-red-500 mt-1 font-medium">{formErrors.mobile}</p>}
               </div>
 
-              {/* Current Location */}
               <div>
                 <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Current Location <span className="text-red-500">*</span></label>
                 <input type="text" placeholder="Enter your current location" value={formData.location} onChange={e => { if (/^[a-zA-Z\s,]*$/.test(e.target.value)) handleFieldChange('location', e.target.value); }} className={`w-full border rounded-xl p-3 text-[13px] font-medium placeholder-gray-400 focus:outline-none focus:ring-1 transition-all bg-gray-50/30 ${formErrors.location ? 'border-red-400 focus:border-red-400 focus:ring-red-400' : 'border-gray-200 focus:border-[#B10D1C] focus:ring-[#B10D1C]'}`} />
                 {formErrors.location && <p className="text-[11px] text-red-500 mt-1 font-medium">{formErrors.location}</p>}
               </div>
 
-              {/* Current Designation */}
               <div>
-                <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Current Designation <span className="text-gray-400 font-normal text-[11px]"></span></label>
+                <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Current Designation</label>
                 <input type="text" placeholder="Enter your current designation" value={formData.designation} onChange={e => { if (/^[a-zA-Z\s]*$/.test(e.target.value)) handleFieldChange('designation', e.target.value); }} className={`w-full border rounded-xl p-3 text-[13px] font-medium placeholder-gray-400 focus:outline-none focus:ring-1 transition-all bg-gray-50/30 ${formErrors.designation ? 'border-red-400 focus:border-red-400 focus:ring-red-400' : 'border-gray-200 focus:border-[#B10D1C] focus:ring-[#B10D1C]'}`} />
                 {formErrors.designation && <p className="text-[11px] text-red-500 mt-1 font-medium">{formErrors.designation}</p>}
               </div>
 
-              {/* Expected Salary */}
               <div>
-                <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Expected Salary (in LPA) <span className="text-gray-400 font-normal text-[11px]"></span></label>
+                <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Expected Salary (in LPA)</label>
                 <input type="text" placeholder="Enter your expected salary" value={formData.expectedSalary} onChange={e => { if (/^\d*\.?\d{0,2}$/.test(e.target.value)) handleFieldChange('expectedSalary', e.target.value); }} className={`w-full border rounded-xl p-3 text-[13px] font-medium placeholder-gray-400 focus:outline-none focus:ring-1 transition-all bg-gray-50/30 ${formErrors.expectedSalary ? 'border-red-400 focus:border-red-400 focus:ring-red-400' : 'border-gray-200 focus:border-[#B10D1C] focus:ring-[#B10D1C]'}`} />
                 {formErrors.expectedSalary && <p className="text-[11px] text-red-500 mt-1 font-medium">{formErrors.expectedSalary}</p>}
               </div>
 
-              {/* Notice Period */}
               <div>
-                <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Notice Period <span className="text-gray-400 font-normal text-[11px]"></span></label>
+                <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Notice Period</label>
                 <input type="text" placeholder="e.g. 30 days, Immediate" value={formData.noticePeriod} onChange={e => { if (/^[a-zA-Z0-9\s]*$/.test(e.target.value)) handleFieldChange('noticePeriod', e.target.value); }} className={`w-full border rounded-xl p-3 text-[13px] font-medium placeholder-gray-400 focus:outline-none focus:ring-1 transition-all bg-gray-50/30 ${formErrors.noticePeriod ? 'border-red-400 focus:border-red-400 focus:ring-red-400' : 'border-gray-200 focus:border-[#B10D1C] focus:ring-[#B10D1C]'}`} />
                 {formErrors.noticePeriod && <p className="text-[11px] text-red-500 mt-1 font-medium">{formErrors.noticePeriod}</p>}
               </div>
 
-              {/* Experience */}
               <div className="relative">
-                <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Experience (in years) <span className="text-gray-400 font-normal text-[11px]"></span></label>
+                <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Experience (in years)</label>
                 <button type="button" onClick={() => setExperienceOpen(o => !o)} className="w-full border border-gray-200 rounded-xl px-3 py-3 text-[13px] font-medium text-left flex items-center justify-between bg-gray-50/30 hover:border-[#B10D1C] focus:outline-none focus:border-[#B10D1C] focus:ring-1 focus:ring-[#B10D1C] transition-all">
                   <span className={formData.experience ? 'text-gray-800' : 'text-gray-400'}>{formData.experience || 'Select experience'}</span>
                   <svg className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${experienceOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
@@ -619,9 +616,8 @@ function JobDetailsPage() {
                 )}
               </div>
 
-              {/* Gender */}
               <div className="relative">
-                <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Gender <span className="text-gray-400 font-normal text-[11px]"></span></label>
+                <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Gender</label>
                 <button type="button" onClick={() => setGenderOpen(o => !o)} className="w-full border border-gray-200 rounded-xl px-3 py-3 text-[13px] font-medium text-left flex items-center justify-between bg-gray-50/30 hover:border-[#B10D1C] focus:outline-none focus:border-[#B10D1C] focus:ring-1 focus:ring-[#B10D1C] transition-all">
                   <span className={formData.gender ? 'text-gray-800' : 'text-gray-400'}>{formData.gender || 'Select gender'}</span>
                   <svg className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${genderOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
@@ -638,30 +634,26 @@ function JobDetailsPage() {
                 )}
               </div>
 
-              {/* Current Salary */}
               <div>
-                <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Current Salary (in LPA) <span className="text-gray-400 font-normal text-[11px]"></span></label>
+                <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Current Salary (in LPA)</label>
                 <input type="text" placeholder="Enter your current salary" value={formData.currentSalary} onChange={e => { if (/^\d*\.?\d{0,2}$/.test(e.target.value)) handleFieldChange('currentSalary', e.target.value); }} className={`w-full border rounded-xl p-3 text-[13px] font-medium placeholder-gray-400 focus:outline-none focus:ring-1 transition-all bg-gray-50/30 ${formErrors.currentSalary ? 'border-red-400 focus:border-red-400 focus:ring-red-400' : 'border-gray-200 focus:border-[#B10D1C] focus:ring-[#B10D1C]'}`} />
                 {formErrors.currentSalary && <p className="text-[11px] text-red-500 mt-1 font-medium">{formErrors.currentSalary}</p>}
               </div>
 
-              {/* Current Company */}
               <div>
-                <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Current Company <span className="text-gray-400 font-normal text-[11px]"></span></label>
+                <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Current Company</label>
                 <input type="text" placeholder="Enter your current company name" value={formData.currentCompany} onChange={e => { if (/^[a-zA-Z0-9\s&.,()-]*$/.test(e.target.value)) handleFieldChange('currentCompany', e.target.value); }} className={`w-full border rounded-xl p-3 text-[13px] font-medium placeholder-gray-400 focus:outline-none focus:ring-1 transition-all bg-gray-50/30 ${formErrors.currentCompany ? 'border-red-400 focus:border-red-400 focus:ring-red-400' : 'border-gray-200 focus:border-[#B10D1C] focus:ring-[#B10D1C]'}`} />
                 {formErrors.currentCompany && <p className="text-[11px] text-red-500 mt-1 font-medium">{formErrors.currentCompany}</p>}
               </div>
 
-              {/* Highest Qualification */}
               <div>
-                <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Highest Qualification <span className="text-gray-400 font-normal text-[11px]"></span></label>
+                <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Highest Qualification</label>
                 <input type="text" placeholder="e.g. B.Tech, MBA, M.Sc" value={formData.highestQualification} onChange={e => { if (/^[a-zA-Z\s.()]*$/.test(e.target.value)) handleFieldChange('highestQualification', e.target.value); }} className={`w-full border rounded-xl p-3 text-[13px] font-medium placeholder-gray-400 focus:outline-none focus:ring-1 transition-all bg-gray-50/30 ${formErrors.highestQualification ? 'border-red-400 focus:border-red-400 focus:ring-red-400' : 'border-gray-200 focus:border-[#B10D1C] focus:ring-[#B10D1C]'}`} />
                 {formErrors.highestQualification && <p className="text-[11px] text-red-500 mt-1 font-medium">{formErrors.highestQualification}</p>}
               </div>
 
             </div>
 
-            {/* Screening Questions in modal if any */}
             {job.screeningQuestions.length > 0 && (
               <div className="flex flex-col gap-4 border-t border-gray-100 pt-4">
                 <p className="text-[13px] font-extrabold text-gray-800 uppercase tracking-wide">Screening Questions</p>
@@ -694,7 +686,7 @@ function JobDetailsPage() {
             </label>
 
             <div className="text-left">
-              <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Cover Letter </label>
+              <label className="block text-[13px] font-bold text-gray-700 mb-1.5">Cover Letter</label>
               <textarea rows={3} placeholder="Write a brief note about yourself and your interest in this role..." value={coverLetter} onChange={e => setCoverLetter(e.target.value)} className="w-full border border-gray-200 rounded-xl p-3 text-[13px] font-medium placeholder-gray-400 focus:outline-none focus:border-[#B10D1C] focus:ring-1 focus:ring-[#B10D1C] transition-all bg-gray-50/30 resize-none"></textarea>
             </div>
 
@@ -713,7 +705,6 @@ function JobDetailsPage() {
                 disabled={applyLoading}
                 onClick={async () => {
                   if (!validateForm()) return;
-                  // parse experience string to number e.g. "1 - 3 Years" → 2
                   const expMap = { '0 - 1 Years': 0.5, '1 - 3 Years': 2, '3 - 5 Years': 4, '5+ Years': 6 };
 
                   let resumeBase64 = '';
@@ -741,10 +732,7 @@ function JobDetailsPage() {
                     current_ctc: parseFloat(formData.currentSalary) || 0,
                     expected_ctc: parseFloat(formData.expectedSalary) || 0,
                     notice_period: parseInt(formData.noticePeriod) || 0,
-
-
                     course: formData.highestQualification,
-
                     applicant_notes: coverLetter,
                     resume_name: resumeName,
                     resume: resumeBase64,

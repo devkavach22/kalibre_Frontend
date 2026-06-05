@@ -127,14 +127,14 @@ export default function UserProfile() {
       <DashboardNavbar />
 
       <div className="max-w-7xl mx-auto w-full px-6 py-6 flex flex-col gap-5">
-        
+
         {/* ── DESIGNED PREMIUM PROFILE HEADER CARD ── */}
-        <div className="bg-white rounded-2xl border shadow-sm flex flex-col md:flex-row items-center justify-between w-full p-6" style={{ borderColor: PINK_BORDER }}>
-          
+        <div className="bg-white rounded-2xl border shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between w-full p-6" style={{ borderColor: PINK_BORDER }}>
+
           {/* Left Side: Avatar & Quick Info */}
-          <div className="flex items-center gap-5 w-full md:w-auto">
+          <div className="flex items-start gap-4 w-full md:w-auto">
             <div className="relative flex-shrink-0">
-              <div className="w-[84px] h-[84px] rounded-full overflow-hidden border-2 border-gray-100 shadow-sm bg-gray-50 flex items-center justify-center">
+              <div className="w-[60px] h-[60px] sm:w-[84px] sm:h-[84px] rounded-full overflow-hidden border-2 border-gray-100 shadow-sm bg-gray-50 flex items-center justify-center">
                 <DefaultAvatar base64={profile.recruiter_details?.logo_base64} />
               </div>
               <button className="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-white border border-gray-200 flex items-center justify-center shadow-sm hover:bg-gray-50 transition">
@@ -142,10 +142,12 @@ export default function UserProfile() {
               </button>
             </div>
 
-            <div>
-              <div className="flex items-center gap-3 flex-wrap mb-1">
-                <h1 className="text-xl font-bold tracking-tight text-gray-900">{displayName}</h1>
-                <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full border bg-emerald-50 text-emerald-700 border-emerald-200">
+            <div className="min-w-0 flex-1 overflow-hidden">
+              <h1 className="text-base leading-snug font-bold tracking-tight text-gray-900 break-all sm:text-xl sm:break-words mb-1">
+                {displayName}
+              </h1>
+              <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full border bg-emerald-50 text-emerald-700 border-emerald-200 flex-shrink-0">
                   Role: {role.toUpperCase()}
                 </span>
               </div>
@@ -153,10 +155,12 @@ export default function UserProfile() {
             </div>
           </div>
 
-          {/* Right Side: Website CTA Link Action Card */}
-          <div className="w-full md:w-auto mt-4 md:mt-0 pt-4 md:pt-0 border-t md:border-t-0 border-gray-100 flex items-center justify-start md:justify-end">
+          {/* Right Side: Stats / CTA — stacks below avatar on mobile */}
+          <div className="w-full md:w-auto mt-4 md:mt-0 pt-4 md:pt-0 border-t md:border-t-0 border-gray-100 flex items-start md:items-center justify-start md:justify-end">
+
+            {/* ✅ CANDIDATE: stacked on mobile, row on desktop */}
             {role === "candidate" && (
-              <div className="flex items-center gap-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
                 <div className="flex items-center gap-3">
                   <BriefcaseStatIcon />
                   <div>
@@ -179,10 +183,10 @@ export default function UserProfile() {
                 <BriefcaseStatIcon />
                 <div>
                   <p className="text-xs text-gray-400 font-medium">Corporate Portal Website</p>
-                  <a 
-                    href={profile.recruiter_details?.website_url || "#"} 
-                    target="_blank" 
-                    rel="noreferrer" 
+                  <a
+                    href={profile.recruiter_details?.website_url || "#"}
+                    target="_blank"
+                    rel="noreferrer"
                     className="text-sm font-bold text-gray-800 hover:text-red-600 flex items-center transition-colors"
                   >
                     {profile.recruiter_details?.website_url ? "Visit System Site" : "No Website Added"}
@@ -206,7 +210,7 @@ export default function UserProfile() {
 
         {/* ── TWO COLUMN DETAILS LAYOUT ── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
-          
+
           {role === "recruiter" ? (
             <>
               {/* CARD 1: COMPANY SPECIFICATIONS */}
@@ -265,7 +269,6 @@ export default function UserProfile() {
             </>
           ) : (
             <>
-              {/* Alternate Role layouts remain securely untouched */}
               <div className="flex flex-col gap-5">
                 {role === "candidate" && (
                   <>
@@ -309,7 +312,6 @@ export default function UserProfile() {
                   </>
                 )}
 
-                {/* ── UPDATED ONLY: EMPLOYER CARD PROFILE ── */}
                 {role === "employer" && (
                   <Card>
                     <SectionHeader title="Corporate Entity Details" iconAction />
@@ -368,8 +370,7 @@ export default function UserProfile() {
                     </div>
                   </Card>
                 )}
-                
-                {/* Fallback space block for symmetrical balancing if needed */}
+
                 {role === "employer" && (
                   <Card>
                     <SectionHeader title="System Operations Matrix" />

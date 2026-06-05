@@ -36,9 +36,6 @@ function CompnayDashbaord() {
               Access Top Talent, Streamline Hiring And Build High-Performing Teams With Confidence.
             </p>
           </div>
-          <button className="bg-red-700 hover:bg-red-800 text-white font-semibold py-3 px-8 rounded-lg shadow-md transition-all duration-200 shrink-0">
-            Create Job
-          </button>
         </div>
       </div>
 

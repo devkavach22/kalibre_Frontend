@@ -1,17 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Logo from '../assets/Logo.png';
-
 function DashboardNavbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
-
   const userName = localStorage.getItem('user_name') || 'User';
-
-  // Check if the current path is an admin route
   const isAdminRoute = location.pathname.startsWith('/admin');
-
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user_name');
@@ -63,15 +58,11 @@ function DashboardNavbar() {
         style={{ boxShadow: '0 1px 12px rgba(0,0,0,0.06)' }}
       >
         <div className="w-full px-4 sm:px-6 lg:px-10 h-18 flex items-center justify-between gap-4 py-3">
-
           <Link to="/candidates" className="flex-shrink-0">
             <img src={Logo} alt="Kalibre Logo" className="h-9 sm:h-10 object-contain" />
           </Link>
-
           <div className="flex items-center gap-3 sm:gap-4 ml-auto">
-
             <div className="hidden md:flex items-center gap-3">
-              {/* Profile button is only rendered if NOT on an admin route */}
               {!isAdminRoute && (
                 <Link to="/profile" className="nav-profile-btn flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -80,11 +71,9 @@ function DashboardNavbar() {
                   My Profile
                 </Link>
               )}
-
               <div className="user-name-badge flex items-center gap-2">
                 <span className="uppercase tracking-wide">{userName}</span>
               </div>
-
               <button onClick={handleLogout} className="nav-logout-btn flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1" />
@@ -92,7 +81,6 @@ function DashboardNavbar() {
                 Logout
               </button>
             </div>
-
             <button
               className="md:hidden p-1.5 text-gray-600 hover:text-[#C8102E] transition-colors duration-200"
               onClick={() => setMenuOpen(!menuOpen)}
@@ -109,14 +97,11 @@ function DashboardNavbar() {
             </button>
           </div>
         </div>
-
         {menuOpen && (
           <div className="md:hidden bg-white border-t border-gray-100 px-6 py-4 flex flex-col gap-3 shadow-inner">
             <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">
               Logged in as: <span className="text-[#C8102E]">{userName}</span>
             </div>
-            
-            {/* Mobile Profile button is also conditionally hidden here */}
             {!isAdminRoute && (
               <Link
                 to="/profile"
@@ -129,7 +114,6 @@ function DashboardNavbar() {
                 My Profile
               </Link>
             )}
-
             <button
               onClick={handleLogout}
               className="text-left text-sm font-semibold text-[#C8102E] flex items-center gap-2 py-2 transition-colors"

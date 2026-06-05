@@ -156,45 +156,46 @@ export default function HrJobdetails() {
                 <span className="text-base font-black text-gray-800 block mt-0.5 capitalize">{details.gender || 'Open to All'}</span>
               </div>
 
-
               <div className="bg-stone-300/60 p-3.5 rounded-xl border border-gray-100/70 flex flex-col justify-center">
                 <span className="block text-[#C1272D] font-bold text-[10px] uppercase tracking-wider mb-1">Pipeline Visibility</span>
-                <div className="flex gap-2">
-                  <span className={`inline-flex items-center gap-1 font-bold text-[11px] px-2.5 py-0.5 rounded-md border capitalize ${details.is_published ? 'bg-blue-50 text-blue-700 border-blue-100' : 'bg-red-50 text-[#C1272D] border-red-100'}`}>
+                <div className="flex flex-col sm:flex-row gap-1.5">
+                  <span className={`inline-flex items-center gap-1 font-bold text-[11px] px-2.5 py-1 rounded-md border capitalize w-fit ${details.is_published ? 'bg-blue-50 text-blue-700 border-blue-100' : 'bg-red-50 text-[#C1272D] border-red-100'}`}>
                     {details.is_published ? 'Published' : 'Unpublished'}
                   </span>
                   {details.position_status && (
-                    <span className={`inline-flex items-center font-bold text-[11px] px-2.5 py-0.5 rounded-md border capitalize ${details.position_status === 'active' ? 'bg-green-50 text-green-700 border-green-100' : 'bg-amber-50 text-amber-700 border-amber-100'}`}>
+                    <span className={`inline-flex items-center font-bold text-[11px] px-2.5 py-1 rounded-md border capitalize w-fit ${details.position_status === 'active' ? 'bg-green-50 text-green-700 border-green-100' : 'bg-amber-50 text-amber-700 border-amber-100'}`}>
                       {details.position_status}
                     </span>
                   )}
                 </div>
-                {/* ✅ Show applied candidates count only if published */}
                 {details.is_published && (
                   <span className="mt-2 text-[12px] font-black text-gray-700">
                     👤  {details.applied_candidates_count ?? 0} Applied
                   </span>
                 )}
               </div>
-
             </div>
           </div>
 
           {/* ── 2. DYNAMIC TAB ARCHITECTURE ── */}
           <div className="bg-white rounded-2xl border border-gray-100/80 shadow-xs overflow-hidden">
-            <div className="flex border-b border-gray-100 bg-gray-50/70 p-2 gap-2">
+
+            {/* ✅ FIX: overflow-x-auto + scrollbar-none so tabs scroll on small screens instead of clipping */}
+            <div className="flex border-b border-gray-100 bg-gray-50/70 p-2 gap-2 overflow-x-auto scrollbar-none">
               <button
                 onClick={() => setActiveTab('role')}
-                className={`px-6 py-3 text-sm font-extrabold rounded-xl transition-all duration-150 ${activeTab === 'role' ? 'bg-white text-[#C1272D] shadow-xs' : 'text-gray-500 hover:text-gray-800'
-                  }`}
+                className={`px-6 py-3 text-sm font-extrabold rounded-xl transition-all duration-150 whitespace-nowrap flex-shrink-0 ${
+                  activeTab === 'role' ? 'bg-white text-[#C1272D] shadow-xs' : 'text-gray-500 hover:text-gray-800'
+                }`}
               >
                 About The Role
               </button>
               {responsibilitiesList.length > 0 && (
                 <button
                   onClick={() => setActiveTab('responsibilities')}
-                  className={`px-6 py-3 text-sm font-extrabold rounded-xl transition-all duration-150 ${activeTab === 'responsibilities' ? 'bg-white text-[#C1272D] shadow-xs' : 'text-gray-500 hover:text-gray-800'
-                    }`}
+                  className={`px-6 py-3 text-sm font-extrabold rounded-xl transition-all duration-150 whitespace-nowrap flex-shrink-0 ${
+                    activeTab === 'responsibilities' ? 'bg-white text-[#C1272D] shadow-xs' : 'text-gray-500 hover:text-gray-800'
+                  }`}
                 >
                   Key Responsibilities ({responsibilitiesList.length})
                 </button>
@@ -202,8 +203,9 @@ export default function HrJobdetails() {
               {company.company_overview && (
                 <button
                   onClick={() => setActiveTab('company')}
-                  className={`px-6 py-3 text-sm font-extrabold rounded-xl transition-all duration-150 ${activeTab === 'company' ? 'bg-white text-[#C1272D] shadow-xs' : 'text-gray-500 hover:text-gray-800'
-                    }`}
+                  className={`px-6 py-3 text-sm font-extrabold rounded-xl transition-all duration-150 whitespace-nowrap flex-shrink-0 ${
+                    activeTab === 'company' ? 'bg-white text-[#C1272D] shadow-xs' : 'text-gray-500 hover:text-gray-800'
+                  }`}
                 >
                   Company Overview
                 </button>
@@ -272,7 +274,7 @@ export default function HrJobdetails() {
             </div>
           )}
 
-          {/* ── 4. REQUIREMENTS & SCREENING TWO-GRID (FONT SIZE & BG FIXED) ── */}
+          {/* ── 4. REQUIREMENTS & SCREENING TWO-GRID ── */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 w-full">
 
             {/* Left Box: Qualifications & Parameters */}
@@ -343,7 +345,7 @@ export default function HrJobdetails() {
           {/* ── 5. NOTIFICATION CHANNELS ── */}
           <div className="bg-white rounded-2xl p-6 border border-gray-100/80 shadow-xs">
             <h2 className="text-[13px] font-black uppercase tracking-wider text-gray-400 mb-3">Active Recruitment Notification Channels</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
               {[
                 { label: 'Email Automation', active: communications.comm_email },
                 { label: 'SMS Carrier Integration', active: communications.comm_sms },
@@ -352,8 +354,9 @@ export default function HrJobdetails() {
               ].map((ch, i) => (
                 <div
                   key={i}
-                  className={`flex items-center gap-2.5 text-xs font-bold px-4 py-3 rounded-xl border transition-all ${ch.active ? 'bg-green-50 border-green-100 text-green-700' : 'bg-stone-300/60 border-gray-100 text-black'
-                    }`}
+                  className={`flex items-center gap-2.5 text-xs font-bold px-4 py-3 rounded-xl border transition-all ${
+                    ch.active ? 'bg-green-50 border-green-100 text-green-700' : 'bg-stone-300/60 border-gray-100 text-black'
+                  }`}
                 >
                   <span className={`w-2 h-2 rounded-full ${ch.active ? 'bg-green-500' : 'bg-gray-300'}`} />
                   {ch.label}
