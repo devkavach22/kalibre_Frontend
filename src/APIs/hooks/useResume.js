@@ -1,17 +1,19 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { parseResumeService, registerCandidateService, getPublishedJobsService ,applyJobService} from "../services/resumeService";
+import { parseResumeService, registerCandidateService, getPublishedJobsService, applyJobService,getJobStageService } from "../services/resumeService";
+
 
 const useResume = () => {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
-    const [applyLoading, setApplyLoading] = useState(false);
+  const [applyLoading, setApplyLoading] = useState(false);
   const [jobsLoading, setJobsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [resumeData, setResumeData] = useState(null);
   const [jobs, setJobs] = useState([]);
+  const [stageData, setStageData] = useState(null);
 
   const parseResume = async (file) => {
     setLoading(true);
@@ -138,7 +140,7 @@ const useResume = () => {
       setJobsLoading(false);
     }
   };
-    const applyJob = async (payload) => {
+  const applyJob = async (payload) => {
     setApplyLoading(true);
     setError(null);
     try {
@@ -153,9 +155,17 @@ const useResume = () => {
       setApplyLoading(false);
     }
   };
+ const getJobStage = async (candidateId, jobId) => {
+  try {
+    const data = await getJobStageService(candidateId, jobId);
+    if (data?.data) setStageData(data.data);
+    return data?.data || null;
+  } catch (err) {
+    return null;
+  }
+};
 
-
-  return { parseResume, registerCandidate, getPublishedJobs,applyJob, loading, submitLoading, jobsLoading, error, resumeData, jobs };
+  return { parseResume, registerCandidate, getPublishedJobs, applyJob,getJobStage, loading, submitLoading, jobsLoading, error, resumeData, jobs };
 };
 
 export default useResume;

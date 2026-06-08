@@ -47,3 +47,9 @@ export const publishJobService = async (job_position_id) => {
     body: JSON.stringify({ job_position_id, is_published: true }),
   });
 };
+
+export const getCandidateAppliedJobsService = async () => {
+  return apiClient(URLS.JOBS.GET_CANDIDATE_APPLIED_JOBS, {
+    method: "GET",
+  });
+};

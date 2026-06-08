@@ -30,3 +30,11 @@ export const applyJobService = async (payload) => {
     body: JSON.stringify(payload),
   });
 };
+
+
+export const getJobStageService = async (candidateId, jobId) => {
+  return apiClient(URLS.JOBS.JOB_STAGE, {
+    method: "POST",
+    body: JSON.stringify({ candidate_id: candidateId, job_id: jobId }),
+  });
+};

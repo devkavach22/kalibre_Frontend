@@ -21,6 +21,8 @@ export const URLS = {
     GET_PUBLISHED: `${BASE_URL}/get_published_jobs`,
     GET_RECRUITER_JOBS: `${BASE_URL}/get_recruiter_jobs`,
     APPLY: `${BASE_URL}/candidate/apply`,
+    GET_CANDIDATE_APPLIED_JOBS: `${BASE_URL}/get_candidate_applied_jobs`,
+    JOB_STAGE: `${BASE_URL}/candidate/job_stage`,
   },
   RECRUITMENT: {
     REGISTER: `${BASE_URL}/recruitment/register`,

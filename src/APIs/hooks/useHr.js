@@ -8,7 +8,8 @@ import {
     getDepartmentsService,
     getLanguagesService,
     getRecruiterJobsService,
-    publishJobService
+    publishJobService,
+    getCandidateAppliedJobsService
 } from "../services/hrService";
 
 export default function useHr() {
@@ -217,6 +218,30 @@ export default function useHr() {
         }
     };
 
+    const fetchCandidateAppliedJobs = async (jobId = null) => {
+        setLoading(true);
+        setError(null);
+        try {
+            const response = await getCandidateAppliedJobsService();
+            if (response && response.status) {
+                const allApplications = response.applications || [];
+                if (jobId !== null && jobId !== undefined) {
+                    return allApplications.filter(
+                        (app) => String(app.job_id) === String(jobId)
+                    );
+                }
+                return allApplications;
+            }
+            return [];
+        } catch (err) {
+            console.error("Fetch candidate applied jobs failure:", err);
+            setError(err.message);
+            return [];
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return {
         createJob,
         registerHr,
@@ -225,6 +250,7 @@ export default function useHr() {
         fetchLanguages,
         fetchRecruiterJobs,
         publishJob,
+        fetchCandidateAppliedJobs,
         departments,
         languages,
         loading,
