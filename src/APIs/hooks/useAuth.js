@@ -89,20 +89,18 @@ const useAuth = () => {
         password: formData.password,
         role: formData.role || "candidate",
       };
+
       const data = await loginUser(payload);
+
       if (data.token) {
         localStorage.setItem("token", data.token);
         localStorage.setItem("user_name", data.user_name || "");
         localStorage.setItem("email", data.email || "");
         localStorage.setItem("user_type", data.user_type);
-        localStorage.setItem(
-          "candidate_registration_done",
-          data.candidate_registration_done
-        );
-        localStorage.setItem(
-          "recruiter_registration_done",
-          data.recruiter_registration_done
-        );
+        localStorage.setItem("candidate_registration_done", data.candidate_registration_done);
+        localStorage.setItem("recruiter_registration_done", data.recruiter_registration_done);
+        localStorage.setItem("user_id", data.user_id || "");
+        localStorage.setItem("candidate_id", data.candidate_id || "");
 
         toast.success("Logged in successfully!");
 
